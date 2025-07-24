@@ -1,0 +1,84 @@
+/* Sidebar styling */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: #343a40;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px 0;
+    transition: all 0.3s;
+}
+
+.sidebar-header {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #4b545c;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    padding: 10px 20px;
+    border-bottom: 1px solid #4b545c;
+}
+
+.sidebar-menu li a {
+    color: #adb5bd;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-menu li a:hover {
+    color: white;
+}
+
+.sidebar-menu li.active {
+    background: #495057;
+}
+
+.sidebar-menu li.active a {
+    color: white;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .sidebar.active {
+        width: 250px;
+    }
+}
+
+/* Common styling */
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.btn {
+    margin-right: 5px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
