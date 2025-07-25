@@ -14,6 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_exam'])) {
     $stmt->execute();
 }
 
+// Edit exam
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_exam'])) {
+    $exam_id = $_POST['exam_id'];
+    $new_title = $_POST['new_title'];
+    $new_subject = $_POST['new_subject'];
+
+    $stmt = $conn->prepare("UPDATE exams SET title=?, subject=? WHERE id=?");
+    $stmt->bind_param("ssi", $new_title, $new_subject, $exam_id);
+    $stmt->execute();
+    header("Location: manage_exams.php");
+    exit;
+}
+
 // Add new question
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_question'])) {
     $exam_id = $_POST['exam_id'];
@@ -42,25 +55,39 @@ $exams = $conn->query("SELECT * FROM exams");
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Manage Exams</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/sidebar.css" rel="stylesheet">
 </head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="../logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="manage_exams.php">Manage Exams</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../logout.php">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <ul class="sidebar-menu">
-            <li class="active"><a href="manage_exams.php">Manage Exams</a></li>
-            <li><a href="../logout.php">Logout</a></li>
-        </ul>
-    </div>
-
-    <div class="main-content">
-        <h2>Exam Management</h2>
-
+    </nav>
+    <div class="container">
+        <h2 class="mb-4">Exam Management</h2>
         <!-- Add Exam -->
         <form method="POST" class="card p-3 mb-4">
             <input type="hidden" name="add_exam" value="1">
@@ -76,46 +103,57 @@ $exams = $conn->query("SELECT * FROM exams");
                 </div>
             </div>
         </form>
-
         <!-- Display Exams and Question Forms -->
         <?php while ($exam = $exams->fetch_assoc()): ?>
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between">
-                <strong><?= $exam['title'] ?> - <?= $exam['subject'] ?></strong>
-                <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <!-- Edit Exam Title/Subject -->
+                    <form method="POST" class="d-flex flex-wrap align-items-center gap-2">
+                        <input type="hidden" name="edit_exam" value="1">
+                        <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
+                        <input type="text" name="new_title" value="<?= htmlspecialchars($exam['title']) ?>" class="form-control w-25" required>
+                        <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
+                        <button class="btn btn-warning btn-sm">Update</button>
+                        <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <!-- Add Question Form -->
+                    <form method="POST">
+                        <input type="hidden" name="add_question" value="1">
+                        <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
+                        <div class="mb-2">
+                            <label>Question</label>
+                            <textarea name="question_text" class="form-control" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="option1" class="form-control" placeholder="Option 1" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="option2" class="form-control" placeholder="Option 2" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="option3" class="form-control" placeholder="Option 3" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" name="option4" class="form-control" placeholder="Option 4" required>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label>Correct Option (1-4)</label>
+                            <input type="number" name="correct_option" min="1" max="4" class="form-control" required>
+                        </div>
+                        <button class="btn btn-success btn-sm">Add Question</button>
+                    </form>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- Add Question Form -->
-                <form method="POST">
-                    <input type="hidden" name="add_question" value="1">
-                    <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
-                    <div class="mb-2">
-                        <label>Question</label>
-                        <textarea name="question_text" class="form-control" required></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <input type="text" name="option1" class="form-control" placeholder="Option 1" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="text" name="option2" class="form-control" placeholder="Option 2" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="text" name="option3" class="form-control" placeholder="Option 3" required>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <input type="text" name="option4" class="form-control" placeholder="Option 4" required>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <label>Correct Option (1-4)</label>
-                        <input type="number" name="correct_option" min="1" max="4" class="form-control" required>
-                    </div>
-                    <button class="btn btn-success btn-sm">Add Question</button>
-                </form>
-            </div>
-        </div>
         <?php endwhile; ?>
     </div>
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+    &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
