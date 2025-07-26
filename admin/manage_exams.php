@@ -41,12 +41,139 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_question'])) {
                             VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isssssi", $exam_id, $question_text, $option1, $option2, $option3, $option4, $correct_option);
     $stmt->execute();
+    
+    // Redirect to prevent form resubmission on refresh
+    header("Location: manage_exams.php");
+    exit;
 }
 
 // Delete exam
 if (isset($_GET['delete'])) {
     $conn->query("DELETE FROM exams WHERE id=" . $_GET['delete']);
     header("Location: manage_exams.php");
+    exit;
+}
+
+// Get questions for an exam (AJAX)
+if (isset($_GET['get_questions'])) {
+    $exam_id = $_GET['get_questions'];
+    $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id ORDER BY id ASC");
+    
+    echo "<div data-exam-id='$exam_id' class='questions-list'>";
+    if ($questions->num_rows > 0) {
+        while ($q = $questions->fetch_assoc()) {
+            echo "<div class='question-item card mb-3' id='question-" . $q['id'] . "'>";
+            echo "<div class='card-body'>";
+            echo "<div class='d-flex justify-content-between align-items-start'>";
+            echo "<h5 class='card-title'>" . htmlspecialchars($q['question_text']) . "</h5>";
+            echo "<div class='question-actions'>";
+            echo "<button class='btn btn-primary btn-sm me-2' onclick='editQuestion(" . $q['id'] . ")'>Edit</button>";
+            echo "<button class='btn btn-danger btn-sm' onclick='removeQuestion(" . $q['id'] . ")'>Remove</button>";
+            echo "</div>";
+            echo "</div>";
+            echo "<div class='options-list'>";
+            for ($i = 1; $i <= 4; $i++) {
+                $optionClass = ($q['correct_option'] == $i) ? 'correct-option' : '';
+                echo "<div class='option-item $optionClass'>";
+                echo "<span class='option-number'>Option $i:</span> " . htmlspecialchars($q["option$i"]) . "";
+                echo "</div>";
+            }
+            echo "</div>";
+            echo "</div>";
+            
+            // Hidden edit form (initially not displayed)
+            echo "<div class='edit-form' id='edit-form-" . $q['id'] . "' style='display:none;'>";
+            echo "<form class='p-3'>";
+            echo "<input type='hidden' name='question_id' value='" . $q['id'] . "'>";
+            echo "<div class='mb-3'>";
+            echo "<label class='form-label'>Question</label>";
+            echo "<textarea class='form-control' name='question_text' required>" . htmlspecialchars($q['question_text']) . "</textarea>";
+            echo "</div>";
+            
+            for ($i = 1; $i <= 4; $i++) {
+                echo "<div class='mb-3'>";
+                echo "<label class='form-label'>Option $i</label>";
+                echo "<input type='text' class='form-control' name='option$i' value='" . htmlspecialchars($q["option$i"]) . "' required>";
+                echo "</div>";
+            }
+            
+            echo "<div class='mb-3'>";
+            echo "<label class='form-label'>Correct Option (1-4)</label>";
+            echo "<select class='form-control' name='correct_option' required>";
+            for ($i = 1; $i <= 4; $i++) {
+                $selected = ($q['correct_option'] == $i) ? 'selected' : '';
+                echo "<option value='$i' $selected>$i</option>";
+            }
+            echo "</select>";
+            echo "</div>";
+            
+            echo "<div class='d-flex gap-2'>";
+            echo "<button type='button' class='btn btn-success btn-sm' onclick='updateQuestion(" . $q['id'] . ")'>
+                    Save Changes
+                  </button>";
+            echo "<button type='button' class='btn btn-secondary btn-sm' onclick='cancelEdit(" . $q['id'] . ")'>
+                    Cancel
+                  </button>";
+            echo "</div>";
+            echo "</form>";
+            echo "</div>";
+            echo "</div>";
+        }
+    } else {
+        echo "<p class='no-questions'>No questions found for this exam.</p>";
+    }
+    echo "</div>";
+    exit;
+}
+
+// Remove a question (AJAX)
+if (isset($_GET['remove_question'])) {
+    $question_id = $_GET['remove_question'];
+    $conn->query("DELETE FROM questions WHERE id=$question_id");
+    echo "success";
+    exit;
+}
+
+// Update a question (AJAX)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_question'])) {
+    $question_id = $_POST['question_id'];
+    $question_text = $_POST['question_text'];
+    $option1 = $_POST['option1'];
+    $option2 = $_POST['option2'];
+    $option3 = $_POST['option3'];
+    $option4 = $_POST['option4'];
+    $correct_option = $_POST['correct_option'];
+    
+    $stmt = $conn->prepare("UPDATE questions SET question_text=?, option1=?, option2=?, option3=?, option4=?, correct_option=? WHERE id=?");
+    $stmt->bind_param("sssssii", $question_text, $option1, $option2, $option3, $option4, $correct_option, $question_id);
+    $stmt->execute();
+    
+    // Return the updated question data for display
+    $result = $conn->query("SELECT * FROM questions WHERE id=$question_id");
+    $question = $result->fetch_assoc();
+    
+    // Format the response as HTML for the updated question display
+    ob_start();
+    echo "<div class='d-flex justify-content-between align-items-start'>";
+    echo "<h5 class='card-title'>" . htmlspecialchars($question['question_text']) . "</h5>";
+    echo "<div class='question-actions'>";
+    echo "<button class='btn btn-primary btn-sm me-2' onclick='editQuestion(" . $question_id . ")'>
+Edit</button>";
+    echo "<button class='btn btn-danger btn-sm' onclick='removeQuestion(" . $question_id . ")'>
+Remove</button>";
+    echo "</div>";
+    echo "</div>";
+    echo "<div class='options-list'>";
+    for ($i = 1; $i <= 4; $i++) {
+        $optionClass = ($question['correct_option'] == $i) ? 'correct-option' : '';
+        echo "<div class='option-item $optionClass'>";
+        echo "<span class='option-number'>Option $i:</span> " . htmlspecialchars($question["option$i"]) . "";
+        echo "</div>";
+    }
+    echo "</div>";
+    $html = ob_get_clean();
+    
+    echo json_encode(['success' => true, 'html' => $html]);
     exit;
 }
 
@@ -106,6 +233,7 @@ $exams = $conn->query("SELECT * FROM exams");
                         <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
                         <button class="btn btn-warning btn-sm">Update</button>
                         <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                        <button type="button" class="btn btn-info btn-sm" onclick="openEditQuestionsModal(<?= $exam['id'] ?>)">Edit Questions</button>
                     </form>
                 </div>
                 <div class="card-body">
@@ -146,6 +274,22 @@ $exams = $conn->query("SELECT * FROM exams");
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
     
+    <!-- Edit Questions Modal -->
+    <div id="editQuestionsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>View Exam Questions</h3>
+                <span class="close" onclick="closeEditQuestionsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="questionsContainer"></div>
+                <div class="text-end">
+                    <button class="btn btn-success mt-3" onclick="closeEditQuestionsModal()">Finished</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleNavbar() {
             const navbar = document.getElementById('navbarNav');
@@ -160,6 +304,108 @@ $exams = $conn->query("SELECT * FROM exams");
         function confirmDelete() {
             return confirm('Are you sure you want to delete this exam?');
         }
+
+        // Modal functions
+        function openEditQuestionsModal(examId) {
+            document.getElementById('editQuestionsModal').style.display = 'block';
+            loadExamQuestions(examId);
+        }
+
+        function closeEditQuestionsModal() {
+            document.getElementById('editQuestionsModal').style.display = 'none';
+        }
+
+        function loadExamQuestions(examId) {
+            // AJAX request to get questions
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `manage_exams.php?get_questions=${examId}`, true);
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    document.getElementById('questionsContainer').innerHTML = this.responseText;
+                }
+            };
+            xhr.send();
+        }
+
+        function editQuestion(questionId) {
+            // Hide the question display and show the edit form
+            document.querySelector(`#question-${questionId} .card-body`).style.display = 'none';
+            document.querySelector(`#edit-form-${questionId}`).style.display = 'block';
+        }
+        
+        function cancelEdit(questionId) {
+            // Hide the edit form and show the question display
+            document.querySelector(`#question-${questionId} .card-body`).style.display = 'block';
+            document.querySelector(`#edit-form-${questionId}`).style.display = 'none';
+        }
+        
+        function updateQuestion(questionId) {
+            const form = document.querySelector(`#edit-form-${questionId} form`);
+            const formData = new FormData();
+            
+            // Add form fields to FormData
+            formData.append('update_question', '1');
+            formData.append('question_id', questionId);
+            formData.append('question_text', form.querySelector('[name="question_text"]').value);
+            formData.append('option1', form.querySelector('[name="option1"]').value);
+            formData.append('option2', form.querySelector('[name="option2"]').value);
+            formData.append('option3', form.querySelector('[name="option3"]').value);
+            formData.append('option4', form.querySelector('[name="option4"]').value);
+            formData.append('correct_option', form.querySelector('[name="correct_option"]').value);
+            
+            // Send AJAX request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'manage_exams.php', true);
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    try {
+                        const response = JSON.parse(this.responseText);
+                        if (response.success) {
+                            // Update the question display with the new content
+                            const cardBody = document.querySelector(`#question-${questionId} .card-body`);
+                            cardBody.innerHTML = response.html;
+                            // Hide the edit form and show the updated question
+                            cardBody.style.display = 'block';
+                            document.querySelector(`#edit-form-${questionId}`).style.display = 'none';
+                        }
+                    } catch (e) {
+                        console.error('Error parsing JSON response:', e);
+                    }
+                }
+            };
+            xhr.send(formData);
+        }
+        
+        function removeQuestion(questionId) {
+            if (confirm('Are you sure you want to remove this question?')) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `manage_exams.php?remove_question=${questionId}`, true);
+                xhr.onload = function() {
+                    if (this.status === 200) {
+                        // Remove just this question from the DOM
+                        const questionElement = document.querySelector(`#question-${questionId}`);
+                        if (questionElement) {
+                            questionElement.remove();
+                            
+                            // Check if there are any questions left
+                            const questionsContainer = document.querySelector('#questionsContainer .questions-list');
+                            if (questionsContainer && !questionsContainer.querySelector('.question-item')) {
+                                questionsContainer.innerHTML = "<p class='no-questions'>No questions found for this exam.</p>";
+                            }
+                        }
+                    }
+                };
+                xhr.send();
+            }
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('editQuestionsModal');
+            if (event.target === modal) {
+                closeEditQuestionsModal();
+            }
+        };
     </script>
 </body>
 </html>
