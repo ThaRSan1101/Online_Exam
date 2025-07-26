@@ -34,7 +34,7 @@ $result = $stmt->get_result();
                 <li class="nav-item">
                     <a class="nav-link active" href="dashboard.php">Dashboard</a>
                 </li>
-                
+    
             </ul>
             <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
         </div>

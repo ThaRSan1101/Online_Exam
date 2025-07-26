@@ -43,9 +43,6 @@ $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
                 <li class="nav-item">
                     <a class="nav-link" href="dashboard.php">Dashboard</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="results.php">Results</a>
-                </li>
             </ul>
             <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
