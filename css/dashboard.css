@@ -82,6 +82,46 @@ body {
     transition: color 0.15s ease-in-out;
 }
 
+.navbar-brand img {
+    height: 40px !important;
+    margin-right: 10px !important;
+}
+
+.navbar-nav {
+    gap: 10px !important;
+    margin-bottom: 0 !important;
+    align-items: center !important;
+}
+
+.nav-link {
+    font-size: 1rem !important;
+    padding: 0.35rem 0.75rem !important;
+    color: rgba(255,255,255,0.95) !important;
+}
+
+navbar-brand {
+    display: flex;
+    flex-direction: row;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.navbar-nav {
+    list-style: none;
+}
+.navbar-nav li {
+    list-style: none;
+}
+
+.nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
 .nav-link:hover {
     color: rgba(255, 255, 255, 0.75);
 }

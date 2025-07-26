@@ -24,15 +24,12 @@ $res = $conn->query("
     <link href="../css/results.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
-        <a class="navbar-brand" href="#">
-            <img src="../images/logo.png" alt="Logo">
-        </a>
-        <button class="navbar-toggler" onclick="toggleNavbar()">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse">
-            <ul class="navbar-nav nav-left">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
+        <div class="container-fluid" style="display: flex; align-items: center; gap: 16px;">
+            <a class="navbar-brand d-flex align-items-center" href="#" style="margin-right: 20px;">
+                <img src="../images/logo.png" alt="Logo" style="height:40px; margin-right:10px;">
+            </a>
+            <ul class="navbar-nav d-flex flex-row align-items-center" style="gap: 10px; margin-bottom: 0;">
                 <li class="nav-item">
                     <a class="nav-link" href="dashboard.php">Dashboard</a>
                 </li>
@@ -40,11 +37,7 @@ $res = $conn->query("
                     <a class="nav-link active" href="results.php">Results</a>
                 </li>
             </ul>
-            <ul class="navbar-nav nav-right">
-                <li class="nav-item">
-                    <a class="nav-link" href="../logout.php">Logout</a>
-                </li>
-            </ul>
+            <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
     </nav>
 

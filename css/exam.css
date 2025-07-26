@@ -194,6 +194,16 @@ input[type="radio"]:checked {
 }
 
 /* Button Styles */
+.btn-short {
+    width: 110px;
+    max-width: 100%;
+    min-width: 0;
+    display: inline-block;
+    text-align: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
 .btn {
     display: inline-block;
     font-weight: 400;

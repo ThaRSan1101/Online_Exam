@@ -21,17 +21,91 @@ body {
     position: sticky;
     top: 0;
     z-index: 1020;
-    background-color: #212529;
-    padding: 0.5rem 1rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background-color: #343a40;
+    color: white;
 }
 
 .navbar-brand {
+    display: inline-block;
+    padding-top: 0.3125rem;
+    padding-bottom: 0.3125rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    line-height: inherit;
+    white-space: nowrap;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.nav-link:hover {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.nav-link.active {
+    color: white;
+}
+
+.container-fluid {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.nav-link {
+    margin-left: 0;
+    margin-right: 0;
+    color: rgba(255,255,255,0.95);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.nav-link:last-child {
+    margin-left: auto;
+    color: #fff;
+}
+
+.navbar-brand {
+    display: inline-block;
+    padding-top: 0.3125rem;
+    padding-bottom: 0.3125rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    line-height: inherit;
+    white-space: nowrap;
     text-decoration: none;
     color: white;
 }
