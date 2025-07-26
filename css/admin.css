@@ -868,7 +868,7 @@ label {
 
 .results-table tbody tr:hover {
     background: #dbefff;
-    transition: background 0.18s;
+    transition:  0.18s;
 }
 
 .results-table th:first-child, .results-table td:first-child {
