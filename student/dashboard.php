@@ -19,24 +19,21 @@ $result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Student Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/sidebar.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
-
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <img src="../images/logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" onclick="toggleNavbar()" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link active" href="dashboard.php">Dashboard</a>
@@ -84,10 +81,19 @@ $result = $stmt->get_result();
             </div>
         </div>
     </div>
-   <footer class="bg-dark text-white text-center py-3 mt-auto">
-    &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
-</footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
+    </footer>
+    <script>
+        function toggleNavbar() {
+            const navbar = document.getElementById('navbarNav');
+            navbar.classList.toggle('show');
+            
+            // Toggle aria-expanded attribute
+            const toggler = document.querySelector('.navbar-toggler');
+            const isExpanded = toggler.getAttribute('aria-expanded') === 'true';
+            toggler.setAttribute('aria-expanded', !isExpanded);
+        }
+    </script>
 </body>
-
 </html>

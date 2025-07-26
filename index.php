@@ -47,84 +47,72 @@ if (isset($_POST['register'])) {
 <html>
 <head>
     <title>Online Exam - Login/Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .form-wrapper {
-            max-width: 500px;
-            margin: auto;
-            margin-top: 80px;
-        }
-        .toggle-link {
-            color: blue;
-            cursor: pointer;
-        }
-        .hidden { display: none; }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-light">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <div class="mx-auto">
+                <img src="images/logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
+                <span class="navbar-brand h1 mb-0">ONLINE EXAMINATION SYSTEM</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
-        <div class="mx-auto">
-            <img src="images/logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
-            <span class="navbar-brand h1 mb-0">ONLINE EXAMINATION SYSTEM</span>
+        <div class="form-wrapper bg-white p-4 rounded shadow">
+            <h3 class="text-center mb-3" id="form-title">Login</h3>
+
+            <?php if (!empty($error)) echo "<div class='alert alert-danger'>$error</div>"; ?>
+            <?php if (!empty($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
+
+            <!-- Login Form -->
+            <form method="POST" id="login-form">
+                <input type="hidden" name="login" value="1">
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password:</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button class="btn btn-primary w-100">Login</button>
+                <p class="mt-3 text-center">Don't have an account? <span class="toggle-link" onclick="showRegister()">Sign Up</span></p>
+            </form>
+
+            <!-- Register Form -->
+            <form method="POST" id="register-form" class="hidden">
+                <input type="hidden" name="register" value="1">
+                <div class="mb-3">
+                    <label class="form-label">Name:</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password:</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button class="btn btn-success w-100">Register</button>
+                <p class="mt-3 text-center">Already have an account? <span class="toggle-link" onclick="showLogin()">Login</span></p>
+            </form>
         </div>
     </div>
-</nav>
 
-<div class="container">
-    <div class="form-wrapper bg-white p-4 rounded shadow">
-        <h3 class="text-center mb-3" id="form-title">Login</h3>
-
-        <?php if (!empty($error)) echo "<div class='alert alert-danger'>$error</div>"; ?>
-        <?php if (!empty($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
-
-        <!-- Login Form -->
-        <form method="POST" id="login-form">
-            <input type="hidden" name="login" value="1">
-            <div class="mb-3">
-                <label class="form-label">Email:</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Password:</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <button class="btn btn-primary w-100">Login</button>
-            <p class="mt-3 text-center">Don't have an account? <span class="toggle-link" onclick="showRegister()">Sign Up</span></p>
-        </form>
-
-        <!-- Register Form -->
-        <form method="POST" id="register-form" class="hidden">
-    <input type="hidden" name="register" value="1">
-    <div class="mb-3">
-        <label class="form-label">Name:</label>
-        <input type="text" name="name" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Email:</label>
-        <input type="email" name="email" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Password:</label>
-        <input type="password" name="password" class="form-control" required>
-    </div>
-    <button class="btn btn-success w-100">Register</button>
-    <p class="mt-3 text-center">Already have an account? <span class="toggle-link" onclick="showLogin()">Login</span></p>
-</form>
-    </div>
-</div>
-
-<script>
-function showRegister() {
-    document.getElementById('login-form').classList.add('hidden');
-    document.getElementById('register-form').classList.remove('hidden');
-    document.getElementById('form-title').innerText = "Register";
-}
-function showLogin() {
-    document.getElementById('register-form').classList.add('hidden');
-    document.getElementById('login-form').classList.remove('hidden');
-    document.getElementById('form-title').innerText = "Login";
-}
-</script>
+    <script>
+    function showRegister() {
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.remove('hidden');
+        document.getElementById('form-title').innerText = "Register";
+    }
+    function showLogin() {
+        document.getElementById('register-form').classList.add('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('form-title').innerText = "Login";
+    }
+    </script>
 </body>
 </html>
