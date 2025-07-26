@@ -55,6 +55,27 @@ if (isset($_GET['delete'])) {
 }
 
 // Get questions for an exam (AJAX)
+
+// Get results for an exam (AJAX)
+if (isset($_GET['get_results'])) {
+    $exam_id = intval($_GET['get_results']);
+    $stmt = $conn->prepare("SELECT u.name, r.score, r.created_at FROM results r JOIN users u ON r.user_id = u.id WHERE r.exam_id = ? ORDER BY u.name");
+    $stmt->bind_param("i", $exam_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        echo "<table class='results-table'><thead><tr><th>Student Name</th><th>Score</th><th>Examination Date</th></tr></thead><tbody>";
+        while ($row = $result->fetch_assoc()) {
+            $date = date('Y-m-d H:i', strtotime($row['created_at']));
+            echo "<tr><td>" . htmlspecialchars($row['name']) . "</td><td>" . htmlspecialchars($row['score']) . "</td><td>" . htmlspecialchars($date) . "</td></tr>";
+        }
+        echo "</tbody></table>";
+    } else {
+        echo "<div class='text-center text-muted'>No results found for this exam.</div>";
+    }
+    exit;
+}
+
 if (isset($_GET['get_questions'])) {
     $exam_id = $_GET['get_questions'];
     $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id ORDER BY id ASC");
@@ -177,6 +198,20 @@ Remove</button>";
     exit;
 }
 
+// Mark exam as finished (AJAX)
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['finish_exam']) &&
+    isset($_POST['exam_id'])
+) {
+    $exam_id = intval($_POST['exam_id']);
+    $stmt = $conn->prepare("UPDATE exams SET status='finished' WHERE id=?");
+    $stmt->bind_param("i", $exam_id);
+    $success = $stmt->execute();
+    echo json_encode(['success' => $success]);
+    exit;
+}
+
 // Get all exams
 $exams = $conn->query("SELECT * FROM exams");
 ?>
@@ -233,7 +268,9 @@ $exams = $conn->query("SELECT * FROM exams");
                         <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
                         <button class="btn btn-warning btn-sm">Update</button>
                         <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
-                        <button type="button" class="btn btn-info btn-sm" onclick="openEditQuestionsModal(<?= $exam['id'] ?>)">Edit Questions</button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="openEditQuestionsModal(<?= $exam['id'] ?>)">View
+                             Questions</button>
+                        <button type="button" class="btn btn-success btn-sm" onclick="openResultsModal(<?= $exam['id'] ?>)">View Result</button>
                     </form>
                 </div>
                 <div class="card-body">
@@ -270,6 +307,25 @@ $exams = $conn->query("SELECT * FROM exams");
         <?php endwhile; ?>
     </div>
     
+    <!-- Results Modal -->
+    <div id="resultsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resultsModalTitle">
+    <div class="modal-content" tabindex="-1">
+        <div class="modal-header">
+            <span style="font-size:1.5rem; margin-right:0.75rem; vertical-align:middle;">&#128202;</span>
+            <h3 id="resultsModalTitle" style="flex:1; margin:0; font-size:1.25rem; font-weight:600; letter-spacing:0.01em;">Exam Results</h3>
+            <span class="close" onclick="closeResultsModal()" aria-label="Close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="resultsContainer" style="min-height:120px;">
+                <div class="text-center text-muted">Loading...</div>
+            </div>
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-primary" style="margin-top: 1.5rem; min-width: 120px;" onclick="closeResultsModal()">Close Form</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
@@ -284,7 +340,7 @@ $exams = $conn->query("SELECT * FROM exams");
             <div class="modal-body">
                 <div id="questionsContainer"></div>
                 <div class="text-end">
-                    <button class="btn btn-success mt-3" onclick="closeEditQuestionsModal()">Finished</button>
+                    <button class="btn btn-success mt-3" onclick="finishExamStatus()">Finished</button>
                 </div>
             </div>
         </div>
@@ -306,13 +362,18 @@ $exams = $conn->query("SELECT * FROM exams");
         }
 
         // Modal functions
+        let currentExamId = null;
         function openEditQuestionsModal(examId) {
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+            currentExamId = examId;
             document.getElementById('editQuestionsModal').style.display = 'block';
             loadExamQuestions(examId);
         }
 
         function closeEditQuestionsModal() {
+    document.body.style.overflow = ''; // Restore background scroll
             document.getElementById('editQuestionsModal').style.display = 'none';
+            currentExamId = null;
         }
 
         function loadExamQuestions(examId) {
@@ -325,6 +386,37 @@ $exams = $conn->query("SELECT * FROM exams");
                 }
             };
             xhr.send();
+        }
+
+        function finishExamStatus() {
+            if (!currentExamId) {
+                alert('Exam ID not found.');
+                return;
+            }
+            if (!confirm('Are you sure you want to mark this exam as finished?')) return;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'manage_exams.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    try {
+                        const resp = JSON.parse(this.responseText);
+                        if (resp.success) {
+                            alert('Exam marked as finished!');
+                            closeEditQuestionsModal();
+                            // Optionally reload page or update UI
+                            location.reload();
+                        } else {
+                            alert('Failed to update exam status.');
+                        }
+                    } catch (e) {
+                        alert('Unexpected server response.');
+                    }
+                } else {
+                    alert('Server error.');
+                }
+            };
+            xhr.send('finish_exam=1&exam_id=' + encodeURIComponent(currentExamId));
         }
 
         function editQuestion(questionId) {
@@ -406,6 +498,36 @@ $exams = $conn->query("SELECT * FROM exams");
                 closeEditQuestionsModal();
             }
         };
-    </script>
+        // Results Modal functions
+    function openResultsModal(examId) {
+        document.body.style.overflow = 'hidden';
+        document.getElementById('resultsModal').style.display = 'block';
+        loadExamResults(examId);
+    }
+    function closeResultsModal() {
+        document.body.style.overflow = '';
+        document.getElementById('resultsModal').style.display = 'none';
+        document.getElementById('resultsContainer').innerHTML = '<div class="text-center text-muted">Loading...</div>';
+    }
+    function loadExamResults(examId) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `manage_exams.php?get_results=${examId}`, true);
+        xhr.onload = function() {
+            if (this.status === 200) {
+                document.getElementById('resultsContainer').innerHTML = this.responseText;
+            } else {
+                document.getElementById('resultsContainer').innerHTML = '<div class="text-danger">Failed to load results.</div>';
+            }
+        };
+        xhr.send();
+    }
+    // Close results modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('resultsModal');
+        if (event.target === modal) {
+            closeResultsModal();
+        }
+    });
+</script>
 </body>
 </html>
