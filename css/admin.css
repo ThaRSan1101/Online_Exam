@@ -551,13 +551,28 @@ label {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     padding: 0;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 800px;
+    width: 60vw;
+    max-width: 600px;
+    height: 98vh;
+    max-height: 98vh;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 100%;
+    padding: 15px;
 }
 
 .modal-header {
@@ -682,4 +697,209 @@ label {
 .btn-info:hover {
     background-color: #7b1fa2; /* Darker purple for hover */
     border-color: #6a1b9a;
+}
+
+/* Distinct admin exam card style */
+.card.mb-4 {
+    border: 2px solid #007bff;
+    background: linear-gradient(120deg, #f6faff 80%, #e3f0ff 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,123,255,0.07), 0 1.5px 6px rgba(0,0,0,0.03);
+    transition: box-shadow 0.18s, border-color 0.18s, background 0.22s;
+    margin-bottom: 1.5rem;
+}
+.card.mb-4:hover {
+    border-color: #0056b3;
+    box-shadow: 0 6px 28px rgba(0,123,255,0.13), 0 2px 8px rgba(0,0,0,0.04);
+    background: linear-gradient(120deg, #eaf6ff 60%, #d2e8ff 100%);
+}
+
+
+/* Modal overlay for results modal */
+#resultsModal {
+    position: fixed;
+    z-index: 1002;
+    left: 0; top: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(30,42,65,0.22);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+#resultsModal[style*='display: block'] {
+    display: flex !important;
+}
+
+/* Results Modal Styles */
+#resultsModal .modal-content {
+    background: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36vw;
+    max-width: 480px;
+    min-width: 320px;
+    border-radius: 12px;
+    box-shadow: 0 8px 36px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    animation: popup-fadein 0.25s;
+    height: auto;
+    max-height: 90vh;
+}
+
+#resultsModal .modal-header {
+    padding: 1rem 1.5rem 0.75rem 1.5rem;
+    background: #007bff;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e3e3e3;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    position: relative;
+}
+#resultsModal .modal-header:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg,#e3e3e3 10%,#fff 90%);
+    opacity: 0.7;
+}
+
+#resultsModal .modal-body {
+    padding: 1.25rem 1.5rem;
+    background: #f9fbfd;
+    overflow-y: visible;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+
+#resultsModal .close {
+    color: #fff;
+    font-size: 1.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: color 0.2s, transform 0.2s;
+    border-radius: 50%;
+    padding: 0 0.4em;
+    line-height: 1;
+    border: none;
+    background: none;
+    outline: none;
+}
+#resultsModal .close:hover, #resultsModal .close:focus {
+    color: #ffd700;
+    background: rgba(255,255,255,0.08);
+    transform: scale(1.18);
+}
+
+@media (max-width: 600px) {
+    #resultsModal .modal-content {
+        width: 96vw;
+        min-width: unset;
+        max-width: 99vw;
+    }
+    #resultsModal .modal-header, #resultsModal .modal-body {
+        padding: 1rem;
+    }
+    .results-table th, .results-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.98rem;
+    }
+}
+
+@keyframes popup-fadein {
+    from { opacity: 0; transform: translate(-50%, -60%) scale(0.97); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+
+/* Standard table styles for results modal */
+.results-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    font-size: 1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin: 0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    table-layout: auto;
+    transition: box-shadow 0.2s;
+}
+
+.results-table th, .results-table td {
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 1.05rem;
+    border: none;
+}
+
+.results-table thead th {
+    background: linear-gradient(90deg, #eaf2fb 0%, #f4f8fb 100%);
+    font-weight: 700;
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    letter-spacing: 0.01em;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+.results-table tbody tr:nth-child(odd) {
+    background: #fff;
+}
+
+.results-table tbody tr:hover {
+    background: #dbefff;
+    transition: background 0.18s;
+}
+
+.results-table th:first-child, .results-table td:first-child {
+    border-top-left-radius: 10px;
+}
+.results-table th:last-child, .results-table td:last-child {
+    border-top-right-radius: 10px;
+}
+
+
+.modal .table th, .modal .table td {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+}
+.modal .table thead th {
+    background: #f4f8fb;
+    font-weight: 600;
+    color: #222;
+    border-bottom: 2px solid #007bff;
+}
+.modal .table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+.modal .table tbody tr:hover {
+    background: #e6f0fa;
+}
+
+  
+
+.card.mb-4:hover {
+    box-shadow: 0 4px 24px rgba(0, 123, 255, 0.18);
+    border-color: #0056b3;
 }
