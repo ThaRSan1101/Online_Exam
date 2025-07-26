@@ -17,9 +17,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exam_id'])) {
         }
     }
 
-    $conn->query("INSERT INTO results(user_id, exam_id, score) VALUES($user_id, $exam_id, $score)");
-    header("Location: results.php");
-    exit();
+    // Check if result already exists
+    $check_sql = "SELECT id FROM results WHERE user_id = $user_id AND exam_id = $exam_id LIMIT 1";
+    $check_res = $conn->query($check_sql);
+    if ($check_res && $check_res->num_rows > 0) {
+        // Result exists, skip insert
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        $conn->query("INSERT INTO results(user_id, exam_id, score) VALUES($user_id, $exam_id, $score)");
+        header("Location: dashboard.php");
+        exit();
+    }
 }
 
 // Normal exam display
@@ -42,9 +51,6 @@ $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
             <ul class="navbar-nav d-flex flex-row align-items-center" style="gap: 10px; margin-bottom: 0;">
                 <li class="nav-item">
                     <a class="nav-link" href="dashboard.php">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="results.php">Results</a>
                 </li>
             </ul>
             <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
