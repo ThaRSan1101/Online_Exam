@@ -45,10 +45,12 @@ if (isset($_POST['register'])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Online Exam - Login/Register</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -102,17 +104,7 @@ if (isset($_POST['register'])) {
         </div>
     </div>
 
-    <script>
-    function showRegister() {
-        document.getElementById('login-form').classList.add('hidden');
-        document.getElementById('register-form').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "Register";
-    }
-    function showLogin() {
-        document.getElementById('register-form').classList.add('hidden');
-        document.getElementById('login-form').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "Login";
-    }
-    </script>
+    <script src="js/index.js"></script>
 </body>
+
 </html>
