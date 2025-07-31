@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_question'])) {
                             VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isssssi", $exam_id, $question_text, $option1, $option2, $option3, $option4, $correct_option);
     $stmt->execute();
-    
+
     // Redirect to prevent form resubmission on refresh
     header("Location: manage_exams.php");
     exit;
@@ -79,7 +79,7 @@ if (isset($_GET['get_results'])) {
 if (isset($_GET['get_questions'])) {
     $exam_id = $_GET['get_questions'];
     $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id ORDER BY id ASC");
-    
+
     echo "<div data-exam-id='$exam_id' class='questions-list'>";
     if ($questions->num_rows > 0) {
         while ($q = $questions->fetch_assoc()) {
@@ -101,7 +101,7 @@ if (isset($_GET['get_questions'])) {
             }
             echo "</div>";
             echo "</div>";
-            
+
             // Hidden edit form (initially not displayed)
             echo "<div class='edit-form' id='edit-form-" . $q['id'] . "' style='display:none;'>";
             echo "<form class='p-3'>";
@@ -110,14 +110,14 @@ if (isset($_GET['get_questions'])) {
             echo "<label class='form-label'>Question</label>";
             echo "<textarea class='form-control' name='question_text' required>" . htmlspecialchars($q['question_text']) . "</textarea>";
             echo "</div>";
-            
+
             for ($i = 1; $i <= 4; $i++) {
                 echo "<div class='mb-3'>";
                 echo "<label class='form-label'>Option $i</label>";
                 echo "<input type='text' class='form-control' name='option$i' value='" . htmlspecialchars($q["option$i"]) . "' required>";
                 echo "</div>";
             }
-            
+
             echo "<div class='mb-3'>";
             echo "<label class='form-label'>Correct Option (1-4)</label>";
             echo "<select class='form-control' name='correct_option' required>";
@@ -127,7 +127,7 @@ if (isset($_GET['get_questions'])) {
             }
             echo "</select>";
             echo "</div>";
-            
+
             echo "<div class='d-flex gap-2'>";
             echo "<button type='button' class='btn btn-success btn-sm' onclick='updateQuestion(" . $q['id'] . ")'>
                     Save Changes
@@ -164,15 +164,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_question'])) {
     $option3 = $_POST['option3'];
     $option4 = $_POST['option4'];
     $correct_option = $_POST['correct_option'];
-    
+
     $stmt = $conn->prepare("UPDATE questions SET question_text=?, option1=?, option2=?, option3=?, option4=?, correct_option=? WHERE id=?");
     $stmt->bind_param("sssssii", $question_text, $option1, $option2, $option3, $option4, $correct_option, $question_id);
     $stmt->execute();
-    
+
     // Return the updated question data for display
     $result = $conn->query("SELECT * FROM questions WHERE id=$question_id");
     $question = $result->fetch_assoc();
-    
+
     // Format the response as HTML for the updated question display
     ob_start();
     echo "<div class='d-flex justify-content-between align-items-start'>";
@@ -193,7 +193,7 @@ Remove</button>";
     }
     echo "</div>";
     $html = ob_get_clean();
-    
+
     echo json_encode(['success' => true, 'html' => $html]);
     exit;
 }
@@ -217,11 +217,13 @@ $exams = $conn->query("SELECT * FROM exams");
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Manage Exams</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/admin.css">
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
         <div class="container-fluid" style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
@@ -236,10 +238,10 @@ $exams = $conn->query("SELECT * FROM exams");
             <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
     </nav>
-    
+
     <div class="container">
         <h2 class="mb-4">Exam Management</h2>
-        
+
         <!-- Add Exam Form -->
         <form method="POST" class="card p-3 mb-4">
             <input type="hidden" name="add_exam" value="1">
@@ -255,7 +257,7 @@ $exams = $conn->query("SELECT * FROM exams");
                 </div>
             </div>
         </form>
-        
+
         <!-- Display Exams and Question Forms -->
         <?php while ($exam = $exams->fetch_assoc()): ?>
             <div class="card mb-4">
@@ -269,7 +271,7 @@ $exams = $conn->query("SELECT * FROM exams");
                         <button class="btn btn-warning btn-sm">Update</button>
                         <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
                         <button type="button" class="btn btn-info btn-sm" onclick="openEditQuestionsModal(<?= $exam['id'] ?>)">View
-                             Questions</button>
+                            Questions</button>
                         <button type="button" class="btn btn-success btn-sm" onclick="openResultsModal(<?= $exam['id'] ?>)">View Result</button>
                     </form>
                 </div>
@@ -306,30 +308,30 @@ $exams = $conn->query("SELECT * FROM exams");
             </div>
         <?php endwhile; ?>
     </div>
-    
+
     <!-- Results Modal -->
     <div id="resultsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resultsModalTitle">
-    <div class="modal-content" tabindex="-1">
-        <div class="modal-header">
-            <span style="font-size:1.5rem; margin-right:0.75rem; vertical-align:middle;">&#128202;</span>
-            <h3 id="resultsModalTitle" style="flex:1; margin:0; font-size:1.25rem; font-weight:600; letter-spacing:0.01em;">Exam Results</h3>
-            <span class="close" onclick="closeResultsModal()" aria-label="Close">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div id="resultsContainer" style="min-height:120px;">
-                <div class="text-center text-muted">Loading...</div>
+        <div class="modal-content" tabindex="-1">
+            <div class="modal-header">
+                <span style="font-size:1.5rem; margin-right:0.75rem; vertical-align:middle;">&#128202;</span>
+                <h3 id="resultsModalTitle" style="flex:1; margin:0; font-size:1.25rem; font-weight:600; letter-spacing:0.01em;">Exam Results</h3>
+                <span class="close" onclick="closeResultsModal()" aria-label="Close">&times;</span>
             </div>
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-primary" style="margin-top: 1.5rem; min-width: 120px;" onclick="closeResultsModal()">Close Form</button>
+            <div class="modal-body">
+                <div id="resultsContainer" style="min-height:120px;">
+                    <div class="text-center text-muted">Loading...</div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-primary" style="margin-top: 1.5rem; min-width: 120px;" onclick="closeResultsModal()">Close Form</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
-    
+
     <!-- Edit Questions Modal -->
     <div id="editQuestionsModal" class="modal">
         <div class="modal-content">
@@ -346,188 +348,7 @@ $exams = $conn->query("SELECT * FROM exams");
         </div>
     </div>
 
-    <script>
-        function toggleNavbar() {
-            const navbar = document.getElementById('navbarNav');
-            navbar.classList.toggle('show');
-            
-            // Toggle aria-expanded attribute
-            const toggler = document.querySelector('.navbar-toggler');
-            const isExpanded = toggler.getAttribute('aria-expanded') === 'true';
-            toggler.setAttribute('aria-expanded', !isExpanded);
-        }
-
-        function confirmDelete() {
-            return confirm('Are you sure you want to delete this exam?');
-        }
-
-        // Modal functions
-        let currentExamId = null;
-        function openEditQuestionsModal(examId) {
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
-            currentExamId = examId;
-            document.getElementById('editQuestionsModal').style.display = 'block';
-            loadExamQuestions(examId);
-        }
-
-        function closeEditQuestionsModal() {
-    document.body.style.overflow = ''; // Restore background scroll
-            document.getElementById('editQuestionsModal').style.display = 'none';
-            currentExamId = null;
-        }
-
-        function loadExamQuestions(examId) {
-            // AJAX request to get questions
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', `manage_exams.php?get_questions=${examId}`, true);
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    document.getElementById('questionsContainer').innerHTML = this.responseText;
-                }
-            };
-            xhr.send();
-        }
-
-        function finishExamStatus() {
-            if (!currentExamId) {
-                alert('Exam ID not found.');
-                return;
-            }
-            if (!confirm('Are you sure you want to mark this exam as finished?')) return;
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'manage_exams.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    try {
-                        const resp = JSON.parse(this.responseText);
-                        if (resp.success) {
-                            alert('Exam marked as finished!');
-                            closeEditQuestionsModal();
-                            // Optionally reload page or update UI
-                            location.reload();
-                        } else {
-                            alert('Failed to update exam status.');
-                        }
-                    } catch (e) {
-                        alert('Unexpected server response.');
-                    }
-                } else {
-                    alert('Server error.');
-                }
-            };
-            xhr.send('finish_exam=1&exam_id=' + encodeURIComponent(currentExamId));
-        }
-
-        function editQuestion(questionId) {
-            // Hide the question display and show the edit form
-            document.querySelector(`#question-${questionId} .card-body`).style.display = 'none';
-            document.querySelector(`#edit-form-${questionId}`).style.display = 'block';
-        }
-        
-        function cancelEdit(questionId) {
-            // Hide the edit form and show the question display
-            document.querySelector(`#question-${questionId} .card-body`).style.display = 'block';
-            document.querySelector(`#edit-form-${questionId}`).style.display = 'none';
-        }
-        
-        function updateQuestion(questionId) {
-            const form = document.querySelector(`#edit-form-${questionId} form`);
-            const formData = new FormData();
-            
-            // Add form fields to FormData
-            formData.append('update_question', '1');
-            formData.append('question_id', questionId);
-            formData.append('question_text', form.querySelector('[name="question_text"]').value);
-            formData.append('option1', form.querySelector('[name="option1"]').value);
-            formData.append('option2', form.querySelector('[name="option2"]').value);
-            formData.append('option3', form.querySelector('[name="option3"]').value);
-            formData.append('option4', form.querySelector('[name="option4"]').value);
-            formData.append('correct_option', form.querySelector('[name="correct_option"]').value);
-            
-            // Send AJAX request
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'manage_exams.php', true);
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    try {
-                        const response = JSON.parse(this.responseText);
-                        if (response.success) {
-                            // Update the question display with the new content
-                            const cardBody = document.querySelector(`#question-${questionId} .card-body`);
-                            cardBody.innerHTML = response.html;
-                            // Hide the edit form and show the updated question
-                            cardBody.style.display = 'block';
-                            document.querySelector(`#edit-form-${questionId}`).style.display = 'none';
-                        }
-                    } catch (e) {
-                        console.error('Error parsing JSON response:', e);
-                    }
-                }
-            };
-            xhr.send(formData);
-        }
-        
-        function removeQuestion(questionId) {
-            if (confirm('Are you sure you want to remove this question?')) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', `manage_exams.php?remove_question=${questionId}`, true);
-                xhr.onload = function() {
-                    if (this.status === 200) {
-                        // Remove just this question from the DOM
-                        const questionElement = document.querySelector(`#question-${questionId}`);
-                        if (questionElement) {
-                            questionElement.remove();
-                            
-                            // Check if there are any questions left
-                            const questionsContainer = document.querySelector('#questionsContainer .questions-list');
-                            if (questionsContainer && !questionsContainer.querySelector('.question-item')) {
-                                questionsContainer.innerHTML = "<p class='no-questions'>No questions found for this exam.</p>";
-                            }
-                        }
-                    }
-                };
-                xhr.send();
-            }
-        }
-
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById('editQuestionsModal');
-            if (event.target === modal) {
-                closeEditQuestionsModal();
-            }
-        };
-        // Results Modal functions
-    function openResultsModal(examId) {
-        document.body.style.overflow = 'hidden';
-        document.getElementById('resultsModal').style.display = 'block';
-        loadExamResults(examId);
-    }
-    function closeResultsModal() {
-        document.body.style.overflow = '';
-        document.getElementById('resultsModal').style.display = 'none';
-        document.getElementById('resultsContainer').innerHTML = '<div class="text-center text-muted">Loading...</div>';
-    }
-    function loadExamResults(examId) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `manage_exams.php?get_results=${examId}`, true);
-        xhr.onload = function() {
-            if (this.status === 200) {
-                document.getElementById('resultsContainer').innerHTML = this.responseText;
-            } else {
-                document.getElementById('resultsContainer').innerHTML = '<div class="text-danger">Failed to load results.</div>';
-            }
-        };
-        xhr.send();
-    }
-    // Close results modal when clicking outside
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('resultsModal');
-        if (event.target === modal) {
-            closeResultsModal();
-        }
-    });
-</script>
+    <script src="../js/admin.js"></script>
 </body>
+
 </html>

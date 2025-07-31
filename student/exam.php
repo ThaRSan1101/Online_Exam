@@ -37,11 +37,13 @@ $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Exam</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/exam.css">
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
         <div class="container-fluid" style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
@@ -85,16 +87,7 @@ $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
-    <script>
-        function toggleNavbar() {
-            const navbar = document.getElementById('navbarNav');
-            navbar.classList.toggle('show');
-            
-            // Toggle aria-expanded attribute
-            const toggler = document.querySelector('.navbar-toggler');
-            const isExpanded = toggler.getAttribute('aria-expanded') === 'true';
-            toggler.setAttribute('aria-expanded', !isExpanded);
-        }
-    </script>
+    <script src="../js/exam.js"></script>
 </body>
+
 </html>
