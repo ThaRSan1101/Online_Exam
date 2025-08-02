@@ -41,7 +41,7 @@ $check_attempted->bind_param("ii", $user_id, $exam_id);
 $check_attempted->execute();
 $already_attempted = $check_attempted->get_result()->num_rows > 0;
 
-$questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id && vibility='visible'");
+$questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
 ?>
 <!DOCTYPE html>
 <html>
