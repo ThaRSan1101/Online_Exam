@@ -2,12 +2,13 @@
 require '../includes/session.php';
 require '../config/db.php';
 
+
 $user_id = $_SESSION['user_id'];
 // Fetch all exams with student's attempt info
 $sql = "
-    SELECT 
-        e.id AS exam_id, 
-        e.title, 
+    SELECT
+        e.id AS exam_id,
+        e.title,
         e.subject,
         (SELECT COUNT(*) FROM results r WHERE r.exam_id = e.id AND r.user_id = ?) AS attempted
     FROM exams e

@@ -234,6 +234,9 @@ $exams = $conn->query("SELECT * FROM exams");
                 <li class="nav-item">
                     <a class="nav-link active" href="manage_exams.php">Manage Exams</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="manage_users.php">Manage Users</a>
+                </li>
             </ul>
             <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
