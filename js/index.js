@@ -60,13 +60,11 @@ function validateLoginForm(e) {
     const password = e.target.querySelector('input[name="password"]').value;
     
     if (!email || !password) {
-        alert('Please fill in all fields.');
         e.preventDefault();
         return false;
     }
     
     if (!isValidEmail(email)) {
-        alert('Please enter a valid email address.');
         e.preventDefault();
         return false;
     }
@@ -80,25 +78,21 @@ function validateRegisterForm(e) {
     const password = e.target.querySelector('input[name="password"]').value;
     
     if (!name || !email || !password) {
-        alert('Please fill in all fields.');
         e.preventDefault();
         return false;
     }
     
     if (name.length < 2) {
-        alert('Name must be at least 2 characters long.');
         e.preventDefault();
         return false;
     }
     
     if (!isValidEmail(email)) {
-        alert('Please enter a valid email address.');
         e.preventDefault();
         return false;
     }
     
     if (password.length < 6) {
-        alert('Password must be at least 6 characters long.');
         e.preventDefault();
         return false;
     }
@@ -151,24 +145,5 @@ function clearCurrentForm() {
         loginForm.reset();
     } else if (!registerForm.classList.contains('hidden')) {
         registerForm.reset();
-    }
-}
-
-// Show loading state during form submission
-function showLoadingState(form) {
-    const submitButton = form.querySelector('button[type="submit"]');
-    if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Please wait...';
-    }
-}
-
-// Reset loading state
-function resetLoadingState(form) {
-    const submitButton = form.querySelector('button[type="submit"]');
-    if (submitButton) {
-        submitButton.disabled = false;
-        const isLogin = form.id === 'login-form';
-        submitButton.textContent = isLogin ? 'Login' : 'Register';
     }
 }

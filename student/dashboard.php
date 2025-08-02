@@ -105,7 +105,6 @@ $result = $stmt->get_result();
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
-    <script src="../js/dashboard.js"></script>
 </body>
 
 </html>

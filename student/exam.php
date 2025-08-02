@@ -33,6 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exam_id'])) {
 
 // Normal exam display
 $exam_id = $_GET['id'];
+$user_id = $_SESSION['user_id'];
+
+// Check if user has already attempted this exam
+$check_attempted = $conn->prepare("SELECT id FROM results WHERE user_id = ? AND exam_id = ? LIMIT 1");
+$check_attempted->bind_param("ii", $user_id, $exam_id);
+$check_attempted->execute();
+$already_attempted = $check_attempted->get_result()->num_rows > 0;
+
 $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
 ?>
 <!DOCTYPE html>
@@ -87,7 +95,14 @@ $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
-    <script src="../js/exam.js"></script>
+
+    <script src="../js/exam.js?v=<?= time() ?>"></script>
+    <?php if ($already_attempted): ?>
+        <script>
+            // Clear any saved answers if exam was already attempted
+            clearSavedAnswers(<?= $exam_id ?>);
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>
