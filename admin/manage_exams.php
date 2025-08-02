@@ -54,6 +54,25 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+if (isset($_GET['hide_exam'])) {
+    $examId = (int) $_GET['hide_exam'];
+    $stmt = $conn->prepare("UPDATE exams SET visibility = 'hide' WHERE id = ?");
+    $stmt->bind_param("i", $examId);
+    $stmt->execute();
+    header("Location: manage_exams.php");
+    exit;
+}
+
+if (isset($_GET['show_exam'])) {
+    $examId = (int) $_GET['show_exam'];
+    $stmt = $conn->prepare("UPDATE exams SET visibility = 'visible' WHERE id = ?");
+    $stmt->bind_param("i", $examId);
+    $stmt->execute();
+    header("Location: manage_exams.php");
+    exit;
+}
+
+
 // Finish exam
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finish_exam'])) {
     $exam_id = $_POST['exam_id'];
@@ -151,6 +170,11 @@ if (isset($_GET['view_results'])) {
                         <button class="btn btn-warning btn-sm">Update</button>
                         <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm">Delete</a>
                         <a href="?view_results=<?= $exam['id'] ?>" class="btn btn-success btn-sm">View Result</a>
+                        <?php if ($exam['visibility'] === 'visible'): ?>
+                            <a href="?hide_exam=<?= $exam['id'] ?>" class="btn btn-info btn-sm">Hide</a>
+                        <?php else: ?>
+                            <a href="?show_exam=<?= $exam['id'] ?>" class="btn btn-primary btn-sm">Show</a>
+                        <?php endif; ?>
                     </form>
                 </div>
                 <div class="card-body position-relative">
