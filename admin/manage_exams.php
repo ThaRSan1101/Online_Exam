@@ -115,7 +115,7 @@ if (isset($_GET['view_results'])) {
                     <a class="nav-link active" href="manage_users.php">Manage Users</a>
                 </li>
             </ul>
-            <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
+            <a class="nav-link" href="#" id="logout-link" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
     </nav>
 
@@ -236,5 +236,13 @@ if (isset($_GET['view_results'])) {
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
 </body>
+
+<script>
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('You have been logged out!');
+        window.location.href = '../logout.php';
+    });
+</script>
 
 </html>
