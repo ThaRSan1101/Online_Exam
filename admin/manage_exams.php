@@ -54,166 +54,43 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Get questions for an exam (AJAX)
-
-// Get results for an exam (AJAX)
-if (isset($_GET['get_results'])) {
-    $exam_id = intval($_GET['get_results']);
-    $stmt = $conn->prepare("SELECT u.name, r.score, r.created_at FROM results r JOIN users u ON r.user_id = u.id WHERE r.exam_id = ? ORDER BY u.name");
-    $stmt->bind_param("i", $exam_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        echo "<table class='results-table'><thead><tr><th>Student Name</th><th>Score</th><th>Examination Date</th></tr></thead><tbody>";
-        while ($row = $result->fetch_assoc()) {
-            $date = date('Y-m-d H:i', strtotime($row['created_at']));
-            echo "<tr><td>" . htmlspecialchars($row['name']) . "</td><td>" . htmlspecialchars($row['score']) . "</td><td>" . htmlspecialchars($date) . "</td></tr>";
-        }
-        echo "</tbody></table>";
-    } else {
-        echo "<div class='text-center text-muted'>No results found for this exam.</div>";
-    }
-    exit;
-}
-
-if (isset($_GET['get_questions'])) {
-    $exam_id = $_GET['get_questions'];
-    $questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id ORDER BY id ASC");
-
-    echo "<div data-exam-id='$exam_id' class='questions-list'>";
-    if ($questions->num_rows > 0) {
-        while ($q = $questions->fetch_assoc()) {
-            echo "<div class='question-item card mb-3' id='question-" . $q['id'] . "'>";
-            echo "<div class='card-body'>";
-            echo "<div class='d-flex justify-content-between align-items-start'>";
-            echo "<h5 class='card-title'>" . htmlspecialchars($q['question_text']) . "</h5>";
-            echo "<div class='question-actions'>";
-            echo "<button class='btn btn-primary btn-sm me-2' onclick='editQuestion(" . $q['id'] . ")'>Edit</button>";
-            echo "<button class='btn btn-danger btn-sm' onclick='removeQuestion(" . $q['id'] . ")'>Remove</button>";
-            echo "</div>";
-            echo "</div>";
-            echo "<div class='options-list'>";
-            for ($i = 1; $i <= 4; $i++) {
-                $optionClass = ($q['correct_option'] == $i) ? 'correct-option' : '';
-                echo "<div class='option-item $optionClass'>";
-                echo "<span class='option-number'>Option $i:</span> " . htmlspecialchars($q["option$i"]) . "";
-                echo "</div>";
-            }
-            echo "</div>";
-            echo "</div>";
-
-            // Hidden edit form (initially not displayed)
-            echo "<div class='edit-form' id='edit-form-" . $q['id'] . "' style='display:none;'>";
-            echo "<form class='p-3'>";
-            echo "<input type='hidden' name='question_id' value='" . $q['id'] . "'>";
-            echo "<div class='mb-3'>";
-            echo "<label class='form-label'>Question</label>";
-            echo "<textarea class='form-control' name='question_text' required>" . htmlspecialchars($q['question_text']) . "</textarea>";
-            echo "</div>";
-
-            for ($i = 1; $i <= 4; $i++) {
-                echo "<div class='mb-3'>";
-                echo "<label class='form-label'>Option $i</label>";
-                echo "<input type='text' class='form-control' name='option$i' value='" . htmlspecialchars($q["option$i"]) . "' required>";
-                echo "</div>";
-            }
-
-            echo "<div class='mb-3'>";
-            echo "<label class='form-label'>Correct Option (1-4)</label>";
-            echo "<select class='form-control' name='correct_option' required>";
-            for ($i = 1; $i <= 4; $i++) {
-                $selected = ($q['correct_option'] == $i) ? 'selected' : '';
-                echo "<option value='$i' $selected>$i</option>";
-            }
-            echo "</select>";
-            echo "</div>";
-
-            echo "<div class='d-flex gap-2'>";
-            echo "<button type='button' class='btn btn-success btn-sm' onclick='updateQuestion(" . $q['id'] . ")'>
-                    Save Changes
-                  </button>";
-            echo "<button type='button' class='btn btn-secondary btn-sm' onclick='cancelEdit(" . $q['id'] . ")'>
-                    Cancel
-                  </button>";
-            echo "</div>";
-            echo "</form>";
-            echo "</div>";
-            echo "</div>";
-        }
-    } else {
-        echo "<p class='no-questions'>No questions found for this exam.</p>";
-    }
-    echo "</div>";
-    exit;
-}
-
-// Remove a question (AJAX)
-if (isset($_GET['remove_question'])) {
-    $question_id = $_GET['remove_question'];
-    $conn->query("DELETE FROM questions WHERE id=$question_id");
-    echo "success";
-    exit;
-}
-
-// Update a question (AJAX)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_question'])) {
-    $question_id = $_POST['question_id'];
-    $question_text = $_POST['question_text'];
-    $option1 = $_POST['option1'];
-    $option2 = $_POST['option2'];
-    $option3 = $_POST['option3'];
-    $option4 = $_POST['option4'];
-    $correct_option = $_POST['correct_option'];
-
-    $stmt = $conn->prepare("UPDATE questions SET question_text=?, option1=?, option2=?, option3=?, option4=?, correct_option=? WHERE id=?");
-    $stmt->bind_param("sssssii", $question_text, $option1, $option2, $option3, $option4, $correct_option, $question_id);
-    $stmt->execute();
-
-    // Return the updated question data for display
-    $result = $conn->query("SELECT * FROM questions WHERE id=$question_id");
-    $question = $result->fetch_assoc();
-
-    // Format the response as HTML for the updated question display
-    ob_start();
-    echo "<div class='d-flex justify-content-between align-items-start'>";
-    echo "<h5 class='card-title'>" . htmlspecialchars($question['question_text']) . "</h5>";
-    echo "<div class='question-actions'>";
-    echo "<button class='btn btn-primary btn-sm me-2' onclick='editQuestion(" . $question_id . ")'>
-Edit</button>";
-    echo "<button class='btn btn-danger btn-sm' onclick='removeQuestion(" . $question_id . ")'>
-Remove</button>";
-    echo "</div>";
-    echo "</div>";
-    echo "<div class='options-list'>";
-    for ($i = 1; $i <= 4; $i++) {
-        $optionClass = ($question['correct_option'] == $i) ? 'correct-option' : '';
-        echo "<div class='option-item $optionClass'>";
-        echo "<span class='option-number'>Option $i:</span> " . htmlspecialchars($question["option$i"]) . "";
-        echo "</div>";
-    }
-    echo "</div>";
-    $html = ob_get_clean();
-
-    echo json_encode(['success' => true, 'html' => $html]);
-    exit;
-}
-
-// Mark exam as finished (AJAX)
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' &&
-    isset($_POST['finish_exam']) &&
-    isset($_POST['exam_id'])
-) {
-    $exam_id = intval($_POST['exam_id']);
+// Finish exam
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finish_exam'])) {
+    $exam_id = $_POST['exam_id'];
     $stmt = $conn->prepare("UPDATE exams SET status='finished' WHERE id=?");
     $stmt->bind_param("i", $exam_id);
-    $success = $stmt->execute();
-    echo json_encode(['success' => $success]);
+    $stmt->execute();
+    header("Location: manage_exams.php");
     exit;
 }
+
+
 
 // Get all exams
 $exams = $conn->query("SELECT * FROM exams");
+
+// Get exam results if requested
+$exam_results = null;
+$selected_exam_id = null;
+$exam_title = null;
+if (isset($_GET['view_results'])) {
+    $selected_exam_id = intval($_GET['view_results']);
+
+    // Get exam title
+    $exam_stmt = $conn->prepare("SELECT title FROM exams WHERE id = ?");
+    $exam_stmt->bind_param("i", $selected_exam_id);
+    $exam_stmt->execute();
+    $exam_result = $exam_stmt->get_result();
+    if ($exam_row = $exam_result->fetch_assoc()) {
+        $exam_title = $exam_row['title'];
+    }
+
+    // Get results with exam title
+    $stmt = $conn->prepare("SELECT u.name, r.score, r.created_at, e.title as exam_title FROM results r JOIN users u ON r.user_id = u.id JOIN exams e ON r.exam_id = e.id WHERE r.exam_id = ? ORDER BY u.name");
+    $stmt->bind_param("i", $selected_exam_id);
+    $stmt->execute();
+    $exam_results = $stmt->get_result();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -272,13 +149,11 @@ $exams = $conn->query("SELECT * FROM exams");
                         <input type="text" name="new_title" value="<?= htmlspecialchars($exam['title']) ?>" class="form-control w-25" required>
                         <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
                         <button class="btn btn-warning btn-sm">Update</button>
-                        <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
-                        <button type="button" class="btn btn-info btn-sm" onclick="openEditQuestionsModal(<?= $exam['id'] ?>)">View
-                            Questions</button>
-                        <button type="button" class="btn btn-success btn-sm" onclick="openResultsModal(<?= $exam['id'] ?>)">View Result</button>
+                        <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="?view_results=<?= $exam['id'] ?>" class="btn btn-success btn-sm">View Result</a>
                     </form>
                 </div>
-                <div class="card-body">
+                <div class="card-body position-relative">
                     <!-- Add Question Form -->
                     <form method="POST">
                         <input type="hidden" name="add_question" value="1">
@@ -307,51 +182,59 @@ $exams = $conn->query("SELECT * FROM exams");
                         </div>
                         <button class="btn btn-success btn-sm">Add Question</button>
                     </form>
+
+                    <!-- Finish Exam Button positioned on the right -->
+                    <div class="position-absolute" style="bottom: 15px; right: 15px;">
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="finish_exam" value="1">
+                            <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
+                            <button type="submit" class="btn btn-warning btn-sm">Finish</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         <?php endwhile; ?>
-    </div>
 
-    <!-- Results Modal -->
-    <div id="resultsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resultsModalTitle">
-        <div class="modal-content" tabindex="-1">
-            <div class="modal-header">
-                <span style="font-size:1.5rem; margin-right:0.75rem; vertical-align:middle;">&#128202;</span>
-                <h3 id="resultsModalTitle" style="flex:1; margin:0; font-size:1.25rem; font-weight:600; letter-spacing:0.01em;">Exam Results</h3>
-                <span class="close" onclick="closeResultsModal()" aria-label="Close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="resultsContainer" style="min-height:120px;">
-                    <div class="text-center text-muted">Loading...</div>
+        <!-- Display Results if requested -->
+        <?php if ($exam_results !== null): ?>
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 style="margin: 0;">Exam Results: <?= htmlspecialchars($exam_title ?? 'Unknown Exam') ?></h4>
+                    <a href="manage_exams.php" class="btn btn-secondary btn-sm">Back to Exam Management</a>
                 </div>
-                <div class="text-center mt-4">
-                    <button type="button" class="btn btn-primary" style="margin-top: 1.5rem; min-width: 120px;" onclick="closeResultsModal()">Close Form</button>
+                <div class="card-body">
+                    <?php if ($exam_results->num_rows > 0): ?>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Exam Title</th>
+                                    <th>Student Name</th>
+                                    <th>Score</th>
+                                    <th>Examination Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $exam_results->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($row['exam_title']) ?></td>
+                                        <td><?= htmlspecialchars($row['name']) ?></td>
+                                        <td><?= htmlspecialchars($row['score']) ?></td>
+                                        <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <div class="text-center text-muted">No results found for this exam.</div>
+                    <?php endif; ?>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
-
-    <!-- Edit Questions Modal -->
-    <div id="editQuestionsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>View Exam Questions</h3>
-                <span class="close" onclick="closeEditQuestionsModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="questionsContainer"></div>
-                <div class="text-end">
-                    <button class="btn btn-success mt-3" onclick="finishExamStatus()">Finished</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="../js/admin.js"></script>
 </body>
 
 </html>
