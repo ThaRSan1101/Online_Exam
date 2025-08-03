@@ -30,7 +30,7 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
                     <a class="nav-link active" href="manage_users.php">Manage Users</a>
                 </li>
             </ul>
-            <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
+            <a class="nav-link" href="#" id="logout-link" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
     </nav>
     <div class="container">
@@ -72,5 +72,11 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
     </footer>
 
 </body>
-
+<script>
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('You have been logged out!');
+        window.location.href = '../logout.php';
+    });
+</script>
 </html>

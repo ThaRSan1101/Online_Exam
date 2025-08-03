@@ -85,10 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finish_exam'])) {
 
 
 
+
+
 // Get all exams
 $exams = $conn->query("SELECT * FROM exams");
 
-// Get exam results if requested
+// Get exam results if requested (for full page view)
 $exam_results = null;
 $selected_exam_id = null;
 $exam_title = null;
@@ -104,8 +106,16 @@ if (isset($_GET['view_results'])) {
         $exam_title = $exam_row['title'];
     }
 
-    // Get results with exam title
-    $stmt = $conn->prepare("SELECT u.name, r.score, r.created_at, e.title as exam_title FROM results r JOIN users u ON r.user_id = u.id JOIN exams e ON r.exam_id = e.id WHERE r.exam_id = ? ORDER BY u.name");
+    // Get results with exam title and total questions
+    $stmt = $conn->prepare("
+        SELECT u.name, r.score, r.created_at, e.title as exam_title,
+        (SELECT COUNT(*) FROM questions q WHERE q.exam_id = e.id) as total_questions
+        FROM results r 
+        JOIN users u ON r.user_id = u.id 
+        JOIN exams e ON r.exam_id = e.id 
+        WHERE r.exam_id = ? 
+        ORDER BY u.name
+    ");
     $stmt->bind_param("i", $selected_exam_id);
     $stmt->execute();
     $exam_results = $stmt->get_result();
@@ -117,7 +127,7 @@ if (isset($_GET['view_results'])) {
 <head>
     <title>Manage Exams</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/admin.css?v=<?= time() ?>">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -134,7 +144,7 @@ if (isset($_GET['view_results'])) {
                     <a class="nav-link active" href="manage_users.php">Manage Users</a>
                 </li>
             </ul>
-            <a class="nav-link" href="../logout.php" style="margin-left:auto; color:#fff;">Logout</a>
+            <a class="nav-link" href="#" id="logout-link" style="margin-left:auto; color:#fff;">Logout</a>
         </div>
     </nav>
 
@@ -168,10 +178,10 @@ if (isset($_GET['view_results'])) {
                         <input type="text" name="new_title" value="<?= htmlspecialchars($exam['title']) ?>" class="form-control w-25" required>
                         <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
                         <button class="btn btn-warning btn-sm">Update</button>
-                        <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm">Delete</a>
-                        <a href="?view_results=<?= $exam['id'] ?>" class="btn btn-success btn-sm">View Result</a>
+                        <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this exam?')">Delete</a>
+                        <a href="?view_results=<?= $exam['id'] ?>" class="btn btn-success btn-sm">View Results</a>
                         <?php if ($exam['visibility'] === 'visible'): ?>
-                            <a href="?hide_exam=<?= $exam['id'] ?>" class="btn btn-info btn-sm">Hide</a>
+                            <a href="?hide_exam=<?= $exam['id'] ?>" class="btn btn-secondary btn-sm">Hide</a>
                         <?php else: ?>
                             <a href="?show_exam=<?= $exam['id'] ?>" class="btn btn-primary btn-sm">Show</a>
                         <?php endif; ?>
@@ -204,17 +214,28 @@ if (isset($_GET['view_results'])) {
                             <label>Correct Option (1-4)</label>
                             <input type="number" name="correct_option" min="1" max="4" class="form-control" required>
                         </div>
-                        <button class="btn btn-success btn-sm">Add Question</button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <button class="btn btn-success btn-sm">Add Question</button>
+                            </div>
+                            <!-- Finish Exam Button positioned in the far right corner -->
+                            <div style="margin-left: auto;">
+                                <?php if (isset($exam['status']) && $exam['status'] === 'finished'): ?>
+                                    <span class="status-finished">
+                                        Finished
+                                    </span>
+                                <?php else: ?>
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="finish_exam" value="1">
+                                        <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
+                                        <button type="submit" class="btn btn-warning btn-sm finish-btn" onclick="return confirm('Are you sure you want to finish this exam? This action cannot be undone.')">
+                                            Finish
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </form>
-
-                    <!-- Finish Exam Button positioned on the right -->
-                    <div class="position-absolute" style="bottom: 15px; right: 15px;">
-                        <form method="POST" style="display: inline;">
-                            <input type="hidden" name="finish_exam" value="1">
-                            <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
-                            <button type="submit" class="btn btn-warning btn-sm">Finish</button>
-                        </form>
-                    </div>
                 </div>
             </div>
         <?php endwhile; ?>
@@ -222,34 +243,41 @@ if (isset($_GET['view_results'])) {
         <!-- Display Results if requested -->
         <?php if ($exam_results !== null): ?>
             <div class="card mt-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 style="margin: 0;">Exam Results: <?= htmlspecialchars($exam_title ?? 'Unknown Exam') ?></h4>
-                    <a href="manage_exams.php" class="btn btn-secondary btn-sm">Back to Exam Management</a>
+                <div class="card-header results-header">
+                    <h4 class="results-title">Exam Results: <?= htmlspecialchars($exam_title ?? 'Unknown Exam') ?></h4>
+                    <a href="manage_exams.php" class="back-btn">
+                        Back to Exam Management
+                    </a>
                 </div>
                 <div class="card-body">
                     <?php if ($exam_results->num_rows > 0): ?>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Exam Title</th>
-                                    <th>Student Name</th>
-                                    <th>Score</th>
-                                    <th>Examination Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = $exam_results->fetch_assoc()): ?>
+                        <div class="results-table-container">
+                            <table class="exam-results-table">
+                                <thead>
                                     <tr>
-                                        <td><?= htmlspecialchars($row['exam_title']) ?></td>
-                                        <td><?= htmlspecialchars($row['name']) ?></td>
-                                        <td><?= htmlspecialchars($row['score']) ?></td>
-                                        <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
+                                        <th>Exam Title</th>
+                                        <th>Student Name</th>
+                                        <th>Score</th>
+                                        <th>Examination Date</th>
                                     </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = $exam_results->fetch_assoc()): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($row['exam_title']) ?></td>
+                                            <td><?= htmlspecialchars($row['name']) ?></td>
+                                            <td><span class="score-badge"><?= htmlspecialchars($row['score']) ?>/<?= htmlspecialchars($row['total_questions']) ?></span></td>
+                                            <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     <?php else: ?>
-                        <div class="text-center text-muted">No results found for this exam.</div>
+                        <div class="no-results">
+                            <h5>No results found for this exam.</h5>
+                            <p>Students haven't taken this exam yet.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -260,5 +288,13 @@ if (isset($_GET['view_results'])) {
         &copy; <?php echo date('Y'); ?> Online Exam System. All rights reserved.
     </footer>
 </body>
+
+<script>
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('You have been logged out!');
+        window.location.href = '../logout.php';
+    });
+</script>
 
 </html>

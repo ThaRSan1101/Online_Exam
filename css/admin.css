@@ -305,10 +305,70 @@ textarea.form-control {
     border-color: #b02a37;
 }
 
+.btn-secondary {
+    color: #fff;
+    background-color: #9c27b0;
+    border-color: #9c27b0;
+}
+
+.btn-secondary:hover {
+    background-color: #7b1fa2;
+    border-color: #6a1b9a;
+}
+
 .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     border-radius: 0.2rem;
+}
+
+/* Finish Button and Status Styling */
+.finish-btn {
+    transition: all 0.3s ease;
+}
+
+.finish-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
+}
+
+.status-finished {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #28a745;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    border: 2px solid transparent;
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.back-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
 }
 
 /* Utility Classes */
@@ -903,3 +963,185 @@ label {
     box-shadow: 0 4px 24px rgba(0, 123, 255, 0.18);
     border-color: #0056b3;
 }
+
+/* Simple Exam Results Table Styling */
+.results-table-container {
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+/* Results Header Styling */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #2196F3;
+    padding: 1rem 1.5rem;
+}
+
+.results-title {
+    margin: 0;
+    color: #2196F3;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    border: 2px solid transparent;
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.back-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+}
+
+.back-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.back-btn:hover svg {
+    transform: translateX(-3px);
+}
+
+.exam-results-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border: 2px solid #2196F3;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exam-results-table thead {
+    background: #2196F3;
+}
+
+.exam-results-table thead th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #1976D2;
+}
+
+.exam-results-table thead th:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.exam-results-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.exam-results-table tbody tr:nth-child(even) {
+    background: #f5f5f5;
+}
+
+.exam-results-table tbody tr:nth-child(odd) {
+    background: white;
+}
+
+.exam-results-table tbody tr:hover {
+    background: #e3f2fd;
+}
+
+.exam-results-table tbody td {
+    padding: 12px 20px;
+    text-align: left;
+    color: #333;
+    font-size: 14px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.exam-results-table tbody td:last-child {
+    border-right: none;
+}
+
+.score-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    min-width: 50px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-results h5 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.no-results p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .results-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .results-title {
+        font-size: 1.2rem;
+    }
+    
+    .back-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    .exam-results-table {
+        font-size: 12px;
+    }
+    
+    .exam-results-table thead th,
+    .exam-results-table tbody td {
+        padding: 10px 12px;
+    }
+    
+    .score-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+
+
+
