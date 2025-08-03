@@ -3,8 +3,19 @@ require '../config/db.php';
 require '../includes/session.php';
 if ($_SESSION['role'] !== 'admin') exit("Access denied");
 
-// session_start();
-
+// Handle status update via form submit
+$status_msg = '';
+if (isset($_POST['update_status'])) {
+    $user_id = intval($_POST['user_id']);
+    $status = $_POST['status'] === 'disable' ? 'disable' : 'active';
+    $stmt = $conn->prepare("UPDATE users SET status=? WHERE id=?");
+    $stmt->bind_param("si", $status, $user_id);
+    if ($stmt->execute()) {
+        $status_msg = "<div class='alert alert-success'>Status updated successfully.</div>";
+    } else {
+        $status_msg = "<div class='alert alert-danger'>Failed to update status.</div>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,6 +46,7 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
     </nav>
     <div class="container">
         <h2 class="mb-4">User Management</h2>
+<?php if (!empty($status_msg)) echo $status_msg; ?>
 
         <div class="card">
             <div class="card-body">
@@ -44,6 +56,7 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,10 +69,24 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
                                 echo "<td>" . htmlspecialchars($user['id']) . "</td>";
                                 echo "<td>" . htmlspecialchars($user['name']) . "</td>";
                                 echo "<td>" . htmlspecialchars($user['email']) . "</td>";
+
+                                // Status dropdown and update form
+                                $status = htmlspecialchars($user['status']);
+                                $id = (int)$user['id'];
+                                echo "<td>"
+                                    . "<form method='POST' style='margin:0;'>"
+                                    . "<input type='hidden' name='user_id' value='$id'>"
+                                    . "<select name='status' onchange='this.form.submit()'>"
+                                    . "<option value='active'" . ($status === 'active' ? ' selected' : '') . ">Active</option>"
+                                    . "<option value='disable'" . ($status === 'disable' ? ' selected' : '') . ">Disable</option>"
+                                    . "</select>"
+                                    . "<input type='hidden' name='update_status' value='1'>"
+                                    . "</form>"
+                                    . "</td>";
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='3' class='text-center text-muted'>No users found</td></tr>";
+                            echo "<tr><td colspan='5' class='text-center text-muted'>No users found</td></tr>";
                         }
                         ?>
                     </tbody>

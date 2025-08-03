@@ -12,8 +12,8 @@ $sql = "
         e.subject,
         (SELECT COUNT(*) FROM results r WHERE r.exam_id = e.id AND r.user_id = ?) AS attempted
     FROM exams e
-    WHERE e.status = 'finished'
-            && e.visibility = 'visible'
+    WHERE e.status='finished'
+    && e.visibility = 'visible'
 ";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
