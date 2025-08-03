@@ -13,14 +13,18 @@ if (isset($_POST['login'])) {
     $user = $res->fetch_assoc();
 
     if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
-        if ($user['role'] === 'admin') {
-            header("Location: admin/manage_exams.php");
+        if ($user['status'] === 'disable') {
+            $error = "Your account is disabled.";
         } else {
-            header("Location: student/dashboard.php");
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
+            if ($user['role'] === 'admin') {
+                header("Location: admin/manage_exams.php");
+            } else {
+                header("Location: student/dashboard.php");
+            }
+            exit();
         }
-        exit();
     } else {
         $error = "Invalid login credentials.";
     }
