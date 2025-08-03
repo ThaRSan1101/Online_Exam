@@ -52,22 +52,22 @@ if (isset($_POST['register'])) {
 
 <head>
     <title>Online Exam - Login/Register</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=<?= time() ?>">
 </head>
 
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg" style="background-color: #007bff !important;">
-        <div class="container">
-            <div class="mx-auto">
-                <img src="images/logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
-                <span class="navbar-brand h1 mb-0" style="color: white !important;">ONLINE EXAMINATION SYSTEM</span>
+<body>
+    <!-- <nav class="custom-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="images/logo.png" alt="Logo" class="logo">
+                <span class="brand-text">ONLINE EXAMINATION SYSTEM</span>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
-    <div class="container">
-        <div class="form-wrapper bg-white p-4 rounded shadow">
-            <h3 class="text-center mb-3" id="form-title">Login</h3>
+    <div class="main-container">
+        <div class="form-wrapper">
+            <h3 class="form-title" id="form-title">Login</h3>
 
             <?php if (!empty($error)) echo "<div class='alert alert-danger'>$error</div>"; ?>
             <?php if (!empty($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
@@ -75,35 +75,35 @@ if (isset($_POST['register'])) {
             <!-- Login Form -->
             <form method="POST" id="login-form">
                 <input type="hidden" name="login" value="1">
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Email:</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" name="email" class="form-input" required>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Password:</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-input" required>
                 </div>
-                <button class="btn btn-primary w-100">Login</button>
-                <p class="mt-3 text-center">Don't have an account? <span class="toggle-link" onclick="showRegister()">Sign Up</span></p>
+                <button class="form-button primary">Login</button>
+                <p class="form-footer">Don't have an account? <span class="toggle-link" onclick="showRegister()">Sign Up</span></p>
             </form>
 
             <!-- Register Form -->
             <form method="POST" id="register-form" class="hidden">
                 <input type="hidden" name="register" value="1">
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Name:</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <input type="text" name="name" class="form-input" required>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Email:</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" name="email" class="form-input" required>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Password:</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-input" required>
                 </div>
-                <button class="btn btn-success w-100">Register</button>
-                <p class="mt-3 text-center">Already have an account? <span class="toggle-link" onclick="showLogin()">Login</span></p>
+                <button class="form-button success">Register</button>
+                <p class="form-footer">Already have an account? <span class="toggle-link" onclick="showLogin()">Login</span></p>
             </form>
         </div>
     </div>
