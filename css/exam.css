@@ -40,56 +40,6 @@ body {
     min-height: 100vh;
 }
 
-/* Navbar Styles */
-.navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    background-color: #343a40;
-    color: white;
-}
-
-.navbar-brand {
-    display: inline-block;
-    padding-top: 0.3125rem;
-    padding-bottom: 0.3125rem;
-    margin-right: 1rem;
-    font-size: 1.25rem;
-    line-height: inherit;
-    white-space: nowrap;
-    color: white;
-    text-decoration: none;
-}
-
-.navbar-nav {
-    display: flex;
-    flex-direction: row;
-    padding-left: 0;
-    margin-bottom: 0;
-    list-style: none;
-}
-
-.nav-link {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: rgba(255, 255, 255, 0.95);
-    text-decoration: none;
-    transition: color 0.15s ease-in-out;
-}
-
-.nav-link:hover {
-    color: rgba(255, 255, 255, 0.75);
-}
-
-.nav-link.active {
-    color: white;
-}
-
 /* Container */
 .container {
     width: 100%;
@@ -287,51 +237,6 @@ footer {
     margin-top: auto;
 }
 
-/* Responsive Navbar */
-.navbar-toggler {
-    padding: 0.25rem 0.75rem;
-    font-size: 1.25rem;
-    line-height: 1;
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.25rem;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-.navbar-collapse {
-    display: flex;
-    flex-basis: 100%;
-    flex-grow: 1;
-    align-items: center;
-}
-
-@media (max-width: 991.98px) {
-    .navbar-expand-lg .navbar-collapse {
-        display: none !important;
-        width: 100%;
-        flex-direction: column;
-    }
-    
-    .navbar-expand-lg .navbar-collapse.show {
-        display: flex !important;
-    }
-    
-    .navbar-nav {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .navbar-toggler {
-        display: block;
-    }
-}
-
-@media (min-width: 992px) {
-    .navbar-toggler {
-        display: none;
-    }
-}
-
 /* Flex Utilities */
 .d-flex {
     display: flex !important;
@@ -343,16 +248,4 @@ footer {
 
 .min-vh-100 {
     min-height: 100vh !important;
-}
-
-.container-fluid {
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
 }

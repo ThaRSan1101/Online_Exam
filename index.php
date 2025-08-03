@@ -56,11 +56,11 @@ if (isset($_POST['register'])) {
 </head>
 
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg" style="background-color: #007bff !important;">
         <div class="container">
             <div class="mx-auto">
                 <img src="images/logo.png" alt="Logo" style="height:48px;vertical-align:middle;margin-right:12px;">
-                <span class="navbar-brand h1 mb-0">ONLINE EXAMINATION SYSTEM</span>
+                <span class="navbar-brand h1 mb-0" style="color: white !important;">ONLINE EXAMINATION SYSTEM</span>
             </div>
         </div>
     </nav>
