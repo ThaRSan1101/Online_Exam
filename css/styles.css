@@ -8,14 +8,18 @@ body {
     color: #212529;
 }
 
+/* Navbar Styles for Index Page */
 .navbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     padding: 0.5rem 1rem;
-    background-color: #343a40;
+    background-color: #007bff !important;
     color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
 }
 
 .navbar-brand {
@@ -24,6 +28,25 @@ body {
     line-height: 1.2;
     margin-bottom: 0;
     white-space: nowrap;
+    color: white !important;
+    text-decoration: none;
+}
+
+.navbar-dark .navbar-brand {
+    color: white !important;
+}
+
+/* Additional navbar styling for index page */
+.mx-auto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0 !important;
+    color: white !important;
 }
 
 .container {
@@ -35,11 +58,11 @@ body {
 }
 
 .form-wrapper {
-    max-width: 500px;
+    max-width: 700px;
     margin: auto;
     margin-top: 80px;
     background-color: white;
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 0.25rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -173,11 +196,7 @@ body {
 }
 
 .bg-dark {
-    background-color: #343a40 !important;
-}
-
-.navbar-dark .navbar-brand {
-    color: white;
+    background-color: #007bff !important;
 }
 
 h3 {

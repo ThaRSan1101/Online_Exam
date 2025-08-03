@@ -29,23 +29,11 @@ $result = $stmt->get_result();
     <title>Student Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/footer.css?v=<?= time() ?>">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
-        <div class="container-fluid" style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-            <a class="navbar-brand d-flex align-items-center" href="#" style="margin-right: 20px;">
-                <img src="../images/logo.png" alt="Logo" style="height:40px; margin-right:10px;">
-            </a>
-            <ul class="navbar-nav d-flex flex-row align-items-center" style="gap: 10px; margin-bottom: 0;">
-                <li class="nav-item">
-                    <a class="nav-link active" href="dashboard.php">Dashboard</a>
-                </li>
-
-            </ul>
-            <a class="nav-link" href="#" id="logout-link" style="margin-left:auto; color:#fff;">Logout</a>
-        </div>
-    </nav>
+    <?php include '../components/student_navbar.php'; ?>
     <div class="container">
         <h2 class="mb-4">Available Exams</h2>
         <div class="card">

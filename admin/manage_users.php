@@ -14,25 +14,11 @@ if ($_SESSION['role'] !== 'admin') exit("Access denied");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Users</title>
     <link rel="stylesheet" href="../css/manage_users.css">
+    <link rel="stylesheet" href="../css/footer.css?v=<?= time() ?>">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-4">
-        <div class="container-fluid" style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-            <a class="navbar-brand d-flex align-items-center" href="#" style="margin-right: 20px;">
-                <img src="../images/logo.png" alt="Logo" style="height:40px; margin-right:10px;">
-            </a>
-            <ul class="navbar-nav d-flex flex-row align-items-center" style="gap: 10px; margin-bottom: 0;">
-                <li class="nav-item">
-                    <a class="nav-link active" href="manage_exams.php">Manage Exams</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="manage_users.php">Manage Users</a>
-                </li>
-            </ul>
-            <a class="nav-link" href="#" id="logout-link" style="margin-left:auto; color:#fff;">Logout</a>
-        </div>
-    </nav>
+    <?php include '../components/admin_navbar.php'; ?>
     <div class="container">
         <h2 class="mb-4">User Management</h2>
 

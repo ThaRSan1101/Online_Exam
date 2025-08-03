@@ -1,0 +1,259 @@
+/* Comprehensive Navbar Styles - Consolidated from all files */
+
+/* Base Navbar Structure */
+.navbar {
+    background-color: #007bff !important;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 60px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    color: white;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    color: #fff !important;
+    text-decoration: none;
+    height: 40px;
+    line-height: 1;
+    font-size: 1.25rem;
+    white-space: nowrap;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding: 8px 12px;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.navbar-brand:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px) scale(1.05);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.navbar-brand img {
+    height: 40px !important;
+    width: auto;
+    margin-right: 10px !important;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px !important;
+    margin-bottom: 0 !important;
+    list-style: none;
+    padding-left: 0;
+    height: 40px;
+    margin: 0;
+}
+
+.nav-item {
+    margin: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+    border-radius: 0.25rem;
+}
+
+.nav-item:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.nav-link {
+    color: #fff !important;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border 0.3s ease-in-out;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 1rem !important;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+}
+
+.container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    height: 100%;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+/* Logout link specific styles */
+#logout-link {
+    margin-left: auto;
+    color: #fff !important;
+    cursor: pointer;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border 0.3s ease-in-out;
+    text-decoration: none;
+    line-height: 1;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+#logout-link:hover {
+    background-color: rgba(220, 53, 69, 0.7);
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+    border: 2px solid rgba(220, 53, 69, 0.8);
+}
+
+/* Navbar Dark Theme */
+.navbar-dark {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Responsive Navbar Toggler */
+.navbar-toggler {
+    padding: 0.25rem 0.75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    color: rgba(255, 255, 255, 0.55);
+    border-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.navbar-toggler:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.1);
+}
+
+.navbar-toggler:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+}
+
+.navbar-collapse {
+    display: flex;
+    flex-basis: 100%;
+    flex-grow: 1;
+    align-items: center;
+}
+
+/* Responsive navbar behavior */
+@media (max-width: 991.98px) {
+    .navbar-expand-lg .navbar-collapse {
+        display: none !important;
+        width: 100%;
+        flex-basis: 100%;
+        flex-direction: column;
+    }
+    
+    .navbar-expand-lg .navbar-collapse.show {
+        display: flex !important;
+    }
+    
+    .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .navbar-toggler {
+        display: block;
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar-toggler {
+        display: none;
+    }
+    
+    .navbar-nav {
+        flex-direction: row;
+    }
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .navbar {
+        height: auto;
+        min-height: 60px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .navbar-nav {
+        flex-direction: column;
+        gap: 5px;
+        height: auto;
+    }
+    
+    .container-fluid {
+        flex-direction: column;
+        gap: 10px;
+        height: auto;
+    }
+    
+    .navbar-brand {
+        margin-right: 0;
+        margin-bottom: 10px;
+        height: 40px;
+    }
+    
+    .nav-item,
+    .nav-link,
+    #logout-link {
+        height: 40px;
+    }
+}
