@@ -201,26 +201,25 @@ if (isset($_GET['view_results'])) {
                             <input type="number" name="correct_option" min="1" max="4" class="form-control" required>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div>
+                            <div class="d-flex gap-2 align-items-center">
                                 <button class="btn btn-success btn-sm">Add Question</button>
-                            </div>
-                            <!-- Finish Exam Button positioned in the far right corner -->
-                            <div style="margin-left: auto;">
+                                
+                                <!-- Finish Exam Button right next to Add Question -->
                                 <?php if (isset($exam['status']) && $exam['status'] === 'finished'): ?>
-                                    <span class="status-finished">
-                                        Finished
-                                    </span>
+                                    <span class="status-finished">Finished</span>
                                 <?php else: ?>
-                                    <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="finish_exam" value="1">
-                                        <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
-                                        <button type="submit" class="btn btn-warning btn-sm finish-btn" onclick="return confirm('Are you sure you want to finish this exam? This action cannot be undone.')">
-                                            Finish
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-warning btn-sm finish-btn" onclick="submitFinishForm(<?= $exam['id'] ?>)">
+                                        Finish
+                                    </button>
                                 <?php endif; ?>
                             </div>
                         </div>
+                    </form>
+
+                    <!-- Hidden Finish Form (separate from Add Question form) -->
+                    <form id="finishForm<?= $exam['id'] ?>" method="POST" style="display: none;">
+                        <input type="hidden" name="finish_exam" value="1">
+                        <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
                     </form>
                 </div>
             </div>
@@ -281,6 +280,12 @@ if (isset($_GET['view_results'])) {
         alert('You have been logged out!');
         window.location.href = '../logout.php';
     });
+
+    function submitFinishForm(examId) {
+        if (confirm('Are you sure you want to finish this exam? This action cannot be undone.')) {
+            document.getElementById('finishForm' + examId).submit();
+        }
+    }
 </script>
 
 </html>
