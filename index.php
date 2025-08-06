@@ -1,45 +1,45 @@
 <?php
 session_start();
 require 'config/db.php';
+require_once 'classes/User.php';
 
-// Handle Login
+$userObj = new User($conn);
+
+// Handle Login 
 if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $user = $res->fetch_assoc();
-
-    if ($user && password_verify($password, $user['password'])) {
-        if ($user['status'] === 'disable') {
-            $error = "Your account is disabled.";
-        } else {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role'];
-            if ($user['role'] === 'admin') {
-                header("Location: admin/manage_exams.php");
+    // Find user by email
+if ($userObj->findByEmail($email)) {
+        // Verify user password
+if ($userObj->verifyPassword($password)) {
+            if ($userObj->status === 'disable') {
+                $error = "Your account is disabled.";
             } else {
-                header("Location: student/dashboard.php");
+                $_SESSION['user_id'] = $userObj->id;
+                $_SESSION['role'] = $userObj->role;
+                if ($userObj->role === 'admin') {
+                    header("Location: admin/manage_exams.php");
+                } else {
+                    header("Location: student/dashboard.php");
+                }
+                exit();
             }
-            exit();
+        } else {
+            $error = "Invalid login credentials.";
         }
     } else {
         $error = "Invalid login credentials.";
     }
 }
 
-// Handle Register
+// Handle Register 
 if (isset($_POST['register'])) {
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = 'student';
-
-    $stmt = $conn->prepare("INSERT INTO users(name, email, password, role) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $email, $password, $role);
-    if ($stmt->execute()) {
+    $password = $_POST['password'];
+    // Register a new user
+if ($userObj->register($name, $email, $password)) {
         $success = "Registered successfully! Please login.";
     } else {
         $error = "Registration failed. Email might already exist.";

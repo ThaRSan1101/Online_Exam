@@ -1,24 +1,12 @@
 <?php
 require '../includes/session.php';
 require '../config/db.php';
-
+require_once '../classes/Exam.php';
 
 $user_id = $_SESSION['user_id'];
-// Fetch all exams with student's attempt info
-$sql = "
-    SELECT
-        e.id AS exam_id,
-        e.title,
-        e.subject,
-        (SELECT COUNT(*) FROM results r WHERE r.exam_id = e.id AND r.user_id = ?) AS attempted
-    FROM exams e
-    WHERE e.status='finished'
-    && e.visibility = 'visible'
-";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$examObj = new Exam($conn);
+// Get all available exams with attempt info for the student
+$exams = $examObj->getAvailableExamsWithAttempt($user_id);
 ?>
 
 
@@ -48,7 +36,7 @@ $result = $stmt->get_result();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($exam = $result->fetch_assoc()): ?>
+                        <?php foreach ($exams as $exam): ?>
                             <tr>
                                 <td><?= htmlspecialchars($exam['title']) ?></td>
                                 <td><?= htmlspecialchars($exam['subject']) ?></td>
@@ -62,22 +50,12 @@ $result = $stmt->get_result();
                                 <td>
                                     <?php
                                     if ($exam['attempted'] > 0) {
-                                        // Fetch score for this user and exam
-                                        $score_sql = "SELECT score FROM results WHERE exam_id = ? AND user_id = ? LIMIT 1";
-                                        $score_stmt = $conn->prepare($score_sql);
-                                        $score_stmt->bind_param("ii", $exam['exam_id'], $user_id);
-                                        $score_stmt->execute();
-                                        $score_result = $score_stmt->get_result();
-                                        if ($score_row = $score_result->fetch_assoc()) {
-                                            // Fetch total questions for this exam
-                                            $total_sql = "SELECT COUNT(*) as total FROM questions WHERE exam_id = ?";
-                                            $total_stmt = $conn->prepare($total_sql);
-                                            $total_stmt->bind_param("i", $exam['exam_id']);
-                                            $total_stmt->execute();
-                                            $total_result = $total_stmt->get_result();
-                                            $total_row = $total_result->fetch_assoc();
-                                            $total_questions = $total_row ? $total_row['total'] : 0;
-                                            echo '<span class="badge bg-success" style="color:#000; background-color:#c3e6cb;">' . $score_row['score'] . ' / ' . $total_questions . '</span>';
+                                        // Get the student's score for this exam
+$score = $examObj->getStudentExamScore($exam['exam_id'], $user_id);
+                                        // Get the total number of questions for this exam
+$total_questions = $examObj->getTotalQuestions($exam['exam_id']);
+                                        if ($score !== null) {
+                                            echo '<span class="badge bg-success" style="color:#000; background-color:#c3e6cb;">' . $score . ' / ' . $total_questions . '</span>';
                                         }
                                     } else {
                                         echo '<span class="badge bg-light" style="color:#000;">Not Attempted</span>';
@@ -85,7 +63,7 @@ $result = $stmt->get_result();
                                     ?>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

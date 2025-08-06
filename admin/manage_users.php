@@ -1,16 +1,17 @@
 <?php
 require '../config/db.php';
 require '../includes/session.php';
+require_once '../classes/User.php';
 if ($_SESSION['role'] !== 'admin') exit("Access denied");
 
-// Handle status update via form submit
+$userObj = new User($conn);
+// Handle status update via form submit 
 $status_msg = '';
 if (isset($_POST['update_status'])) {
     $user_id = intval($_POST['user_id']);
     $status = $_POST['status'] === 'disable' ? 'disable' : 'active';
-    $stmt = $conn->prepare("UPDATE users SET status=? WHERE id=?");
-    $stmt->bind_param("si", $status, $user_id);
-    if ($stmt->execute()) {
+    // Update user status
+    if ($userObj->updateStatus($user_id, $status)) {
         $status_msg = "<div class='alert alert-success'>Status updated successfully.</div>";
     } else {
         $status_msg = "<div class='alert alert-danger'>Failed to update status.</div>";
@@ -32,7 +33,7 @@ if (isset($_POST['update_status'])) {
     <?php include '../components/admin_navbar.php'; ?>
     <div class="container">
         <h2 class="mb-4">User Management</h2>
-<?php if (!empty($status_msg)) echo $status_msg; ?>
+        <?php if (!empty($status_msg)) echo $status_msg; ?>
 
         <div class="card">
             <div class="card-body">
@@ -47,10 +48,10 @@ if (isset($_POST['update_status'])) {
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch users from the database
-                        $stmt = $conn->query("SELECT * FROM users where role='student' ORDER BY id ASC");
-                        if ($stmt->num_rows > 0) {
-                            while ($user = $stmt->fetch_assoc()) {
+                        // Get all student users
+$students = $userObj->getAllStudents();
+                        if (count($students) > 0) {
+                            foreach ($students as $user) {
                                 echo "<tr>";
                                 echo "<td>" . htmlspecialchars($user['id']) . "</td>";
                                 echo "<td>" . htmlspecialchars($user['name']) . "</td>";

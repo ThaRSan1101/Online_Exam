@@ -1,33 +1,70 @@
 <?php
 require '../includes/session.php';
 require '../config/db.php';
+require_once '../classes/Exam.php';
 if ($_SESSION['role'] !== 'admin') exit("Access denied");
 
-// Add new exam
+$examObj = new Exam($conn);
+
+// Add new exam 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_exam'])) {
     $title = $_POST['title'];
     $subject = $_POST['subject'];
     $created_by = $_SESSION['user_id'];
-
-    $stmt = $conn->prepare("INSERT INTO exams(title, subject, created_by) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssi", $title, $subject, $created_by);
-    $stmt->execute();
+    // Create a new exam
+$examObj->create($title, $subject, $created_by);
 }
 
-// Edit exam
+// Edit exam 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_exam'])) {
     $exam_id = $_POST['exam_id'];
     $new_title = $_POST['new_title'];
     $new_subject = $_POST['new_subject'];
-
-    $stmt = $conn->prepare("UPDATE exams SET title=?, subject=? WHERE id=?");
-    $stmt->bind_param("ssi", $new_title, $new_subject, $exam_id);
-    $stmt->execute();
+    // Update exam details using the update method
+    $examObj->update($exam_id, $new_title, $new_subject);
     header("Location: manage_exams.php");
     exit;
 }
 
-// Add new question
+// Delete exam 
+if (isset($_GET['delete'])) {
+    // Delete an exam using the delete method
+    $examObj->delete((int)$_GET['delete']);
+    header("Location: manage_exams.php");
+    exit;
+}
+
+// Hide exam 
+if (isset($_GET['hide_exam'])) {
+    // Hide an exam using the setVisibility method
+    $examObj->setVisibility((int)$_GET['hide_exam'], 'hide');
+    header("Location: manage_exams.php");
+    exit;
+}
+
+// Show exam 
+if (isset($_GET['show_exam'])) {
+    // Show an exam using the setVisibility method
+    $examObj->setVisibility((int)$_GET['show_exam'], 'visible');
+    header("Location: manage_exams.php");
+    exit;
+}
+
+// Finish exam 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finish_exam'])) {
+    $exam_id = $_POST['exam_id'];
+    // Mark exam as finished using the finish method
+    $examObj->finish($exam_id);
+    header("Location: manage_exams.php");
+    exit;
+}
+
+// Get all exams 
+$exams = $examObj->getAll();
+
+require_once '../classes/Question.php';
+$questionObj = new Question($conn);
+// Add new question 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_question'])) {
     $exam_id = $_POST['exam_id'];
     $question_text = $_POST['question_text'];
@@ -36,89 +73,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_question'])) {
     $option3 = $_POST['option3'];
     $option4 = $_POST['option4'];
     $correct_option = $_POST['correct_option'];
-
-    $stmt = $conn->prepare("INSERT INTO questions (exam_id, question_text, option1, option2, option3, option4, correct_option) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssssi", $exam_id, $question_text, $option1, $option2, $option3, $option4, $correct_option);
-    $stmt->execute();
-
+    // Create a new question using the create method
+    $questionObj->create($exam_id, $question_text, $option1, $option2, $option3, $option4, $correct_option);
     // Redirect to prevent form resubmission on refresh
     header("Location: manage_exams.php");
     exit;
 }
 
-// Delete exam
-if (isset($_GET['delete'])) {
-    $conn->query("DELETE FROM exams WHERE id=" . $_GET['delete']);
-    header("Location: manage_exams.php");
-    exit;
-}
-
-if (isset($_GET['hide_exam'])) {
-    $examId = (int) $_GET['hide_exam'];
-    $stmt = $conn->prepare("UPDATE exams SET visibility = 'hide' WHERE id = ?");
-    $stmt->bind_param("i", $examId);
-    $stmt->execute();
-    header("Location: manage_exams.php");
-    exit;
-}
-
-if (isset($_GET['show_exam'])) {
-    $examId = (int) $_GET['show_exam'];
-    $stmt = $conn->prepare("UPDATE exams SET visibility = 'visible' WHERE id = ?");
-    $stmt->bind_param("i", $examId);
-    $stmt->execute();
-    header("Location: manage_exams.php");
-    exit;
-}
-
-
-// Finish exam
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finish_exam'])) {
-    $exam_id = $_POST['exam_id'];
-    $stmt = $conn->prepare("UPDATE exams SET status='finished' WHERE id=?");
-    $stmt->bind_param("i", $exam_id);
-    $stmt->execute();
-    header("Location: manage_exams.php");
-    exit;
-}
-
-
-
-
-
-// Get all exams
-$exams = $conn->query("SELECT * FROM exams");
-
-// Get exam results if requested (for full page view)
+// Get exam results if requested (for full page view) 
 $exam_results = null;
 $selected_exam_id = null;
 $exam_title = null;
 if (isset($_GET['view_results'])) {
     $selected_exam_id = intval($_GET['view_results']);
-
-    // Get exam title
-    $exam_stmt = $conn->prepare("SELECT title FROM exams WHERE id = ?");
-    $exam_stmt->bind_param("i", $selected_exam_id);
-    $exam_stmt->execute();
-    $exam_result = $exam_stmt->get_result();
-    if ($exam_row = $exam_result->fetch_assoc()) {
-        $exam_title = $exam_row['title'];
-    }
-
-    // Get results with exam title and total questions
-    $stmt = $conn->prepare("
-        SELECT u.name, r.score, r.created_at, e.title as exam_title,
-        (SELECT COUNT(*) FROM questions q WHERE q.exam_id = e.id) as total_questions
-        FROM results r 
-        JOIN users u ON r.user_id = u.id 
-        JOIN exams e ON r.exam_id = e.id 
-        WHERE r.exam_id = ? 
-        ORDER BY u.name
-    ");
-    $stmt->bind_param("i", $selected_exam_id);
-    $stmt->execute();
-    $exam_results = $stmt->get_result();
+    // Get exam title by ID using the getTitleById method
+    $exam_title = $examObj->getTitleById($selected_exam_id); // new method in Exam.php
+    // Get exam results with total questions using the getResultsWithTotalQuestions method
+    $exam_results = $examObj->getResultsWithTotalQuestions($selected_exam_id); // new method in Exam.php
 }
 ?>
 <!DOCTYPE html>
@@ -154,7 +125,7 @@ if (isset($_GET['view_results'])) {
         </form>
 
         <!-- Display Exams and Question Forms -->
-        <?php while ($exam = $exams->fetch_assoc()): ?>
+        <?php foreach ($exams as $exam): ?>
             <div class="card mb-4">
                 <div class="card-header">
                     <!-- Edit Exam Title/Subject -->
@@ -223,7 +194,7 @@ if (isset($_GET['view_results'])) {
                     </form>
                 </div>
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
 
         <!-- Display Results if requested -->
         <?php if ($exam_results !== null): ?>
