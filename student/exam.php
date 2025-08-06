@@ -1,6 +1,11 @@
 <?php
 require '../includes/session.php';
 require '../config/db.php';
+require_once '../classes/Question.php';
+require_once '../classes/Exam.php';
+
+$questionObj = new Question($conn);
+$examObj = new Exam($conn);
 
 // Handle exam submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exam_id'])) {
@@ -10,22 +15,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exam_id'])) {
 
     $score = 0;
     foreach ($answers as $qid => $selected) {
-        $res = $conn->query("SELECT correct_option FROM questions WHERE id=$qid");
-        $correct = $res->fetch_assoc()['correct_option'];
-        if ($correct == $selected) {
+        // Get question details by question ID
+$question = $questionObj->getById($qid);
+        if ($question && $question['correct_option'] == $selected) {
             $score++;
         }
     }
 
-    // Check if result already exists
-    $check_sql = "SELECT id FROM results WHERE user_id = $user_id AND exam_id = $exam_id LIMIT 1";
-    $check_res = $conn->query($check_sql);
-    if ($check_res && $check_res->num_rows > 0) {
+    // Check if result already exists using 
+    require_once '../classes/Exam.php';
+    $examObj = new Exam($conn);
+    if ($examObj->hasStudentAttempted($exam_id, $user_id)) {
         // Result exists, skip insert
         header("Location: dashboard.php");
         exit();
     } else {
-        $conn->query("INSERT INTO results(user_id, exam_id, score) VALUES($user_id, $exam_id, $score)");
+        // Insert the student's result for this exam
+$examObj->insertResult($user_id, $exam_id, $score);
         header("Location: dashboard.php");
         exit();
     }
@@ -35,13 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exam_id'])) {
 $exam_id = $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-// Check if user has already attempted this exam
-$check_attempted = $conn->prepare("SELECT id FROM results WHERE user_id = ? AND exam_id = ? LIMIT 1");
-$check_attempted->bind_param("ii", $user_id, $exam_id);
-$check_attempted->execute();
-$already_attempted = $check_attempted->get_result()->num_rows > 0;
+// Check if user has already attempted this exam 
+$already_attempted = $examObj->hasStudentAttempted($exam_id, $user_id);
 
-$questions = $conn->query("SELECT * FROM questions WHERE exam_id=$exam_id");
+// Get all questions for this exam
+$questions = $questionObj->getByExam($exam_id);
 ?>
 <!DOCTYPE html>
 <html>
