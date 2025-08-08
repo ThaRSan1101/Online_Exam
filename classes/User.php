@@ -6,6 +6,7 @@ class User {
     public $email;
     public $role;
     public $status;
+    public $password;  // ✅ Added missing password property
 
     public function __construct($conn) {
         $this->conn = $conn;
