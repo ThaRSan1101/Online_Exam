@@ -1,19 +1,22 @@
 <?php
-class User {
+class User
+{
     private $conn;
     public $id;
     public $name;
     public $email;
     public $role;
     public $status;
-    public $password;  // ✅ Added missing password property
+    public $password; 
 
-    public function __construct($conn) {
+    public function __construct($conn)
+    {
         $this->conn = $conn;
     }
 
     // Find user by email
-    public function findByEmail($email) {
+    public function findByEmail($email)
+    {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE email=?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -32,12 +35,14 @@ class User {
     }
 
     // Verify user password
-    public function verifyPassword($password) {
+    public function verifyPassword($password)
+    {
         return password_verify($password, $this->password);
     }
 
     // Register a new user
-    public function register($name, $email, $password) {
+    public function register($name, $email, $password)
+    {
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $role = 'student';
         $stmt = $this->conn->prepare("INSERT INTO users(name, email, password, role) VALUES (?, ?, ?, ?)");
@@ -46,7 +51,8 @@ class User {
     }
 
     // Get all student users
-    public function getAllStudents() {
+    public function getAllStudents()
+    {
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE role='student' ORDER BY id ASC");
         $stmt->execute();
         $result = $stmt->get_result();
@@ -58,10 +64,10 @@ class User {
     }
 
     // Update user status
-    public function updateStatus($user_id, $status) {
+    public function updateStatus($user_id, $status)
+    {
         $stmt = $this->conn->prepare("UPDATE users SET status=? WHERE id=?");
         $stmt->bind_param("si", $status, $user_id);
         return $stmt->execute();
     }
 }
-?>
