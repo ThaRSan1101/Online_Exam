@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_exam'])) {
     $subject = $_POST['subject'];
     $created_by = $_SESSION['user_id'];
     // Create a new exam
-$examObj->create($title, $subject, $created_by);
+    $examObj->create($title, $subject, $created_by);
 }
 
 // Edit exam 
@@ -134,7 +134,7 @@ if (isset($_GET['view_results'])) {
                         <input type="hidden" name="exam_id" value="<?= $exam['id'] ?>">
                         <input type="text" name="new_title" value="<?= htmlspecialchars($exam['title']) ?>" class="form-control w-25" required>
                         <input type="text" name="new_subject" value="<?= htmlspecialchars($exam['subject']) ?>" class="form-control w-25" required>
-                        <button class="btn btn-warning btn-sm">Update</button>
+                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to update this exam title and subject?')">Update</button>
                         <a href="?delete=<?= $exam['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this exam?')">Delete</a>
                         <a href="?view_results=<?= $exam['id'] ?>" class="btn btn-success btn-sm">View Results</a>
                         <?php if ($exam['visibility'] === 'visible'): ?>
@@ -174,7 +174,7 @@ if (isset($_GET['view_results'])) {
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex gap-2 align-items-center">
                                 <button class="btn btn-success btn-sm">Add Question</button>
-                                
+
                                 <!-- Finish Exam Button right next to Add Question -->
                                 <?php if (isset($exam['status']) && $exam['status'] === 'finished'): ?>
                                     <span class="status-finished">Finished</span>
