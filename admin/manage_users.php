@@ -1,4 +1,4 @@
-KO<?php
+<?php
 require '../config/db.php';
 require '../includes/session.php';
 require_once '../classes/User.php';
